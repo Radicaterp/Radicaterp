@@ -63,6 +63,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/about" element={<About />} />
+            <Route path="/staff" element={<Staff />} />
             <Route
               path="/applications"
               element={user ? <Applications /> : <Navigate to="/" />}
@@ -70,6 +71,14 @@ function App() {
             <Route
               path="/my-applications"
               element={user ? <MyApplications /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/report"
+              element={user ? <Report /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/my-reports"
+              element={user ? <MyReports /> : <Navigate to="/" />}
             />
             <Route
               path="/admin"
