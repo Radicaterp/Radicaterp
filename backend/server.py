@@ -750,14 +750,22 @@ async def review_application(
                 assigned_team["name"]
             )
     
-    # Send Discord embed in background
+    # Send Discord embed in background with team info if staff application
+    head_admin_id = None
+    team_name = None
+    if review.status == "approved" and application["application_type_name"].lower() == "staff" and assigned_team:
+        head_admin_id = assigned_team["head_admin_id"]
+        team_name = assigned_team["name"]
+    
     background_tasks.add_task(
         send_discord_embed,
         application["user_id"],
         application["username"],
         application["application_type_name"],
         review.status,
-        user.username
+        user.username,
+        head_admin_id,
+        team_name
     )
     
     return {"success": True}
