@@ -82,6 +82,54 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  position: relative;
+  animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+    text-shadow: none;
+  }
+  92% {
+    transform: translate(-2px, 2px);
+    text-shadow: 2px -2px 0 #4A90E2, -2px 2px 0 #5fa3f5;
+  }
+  94% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 2px 0 #4A90E2, 2px -2px 0 #5fa3f5;
+  }
+  96% {
+    transform: translate(-2px, -2px);
+    text-shadow: 2px 2px 0 #4A90E2, -2px -2px 0 #5fa3f5;
+  }
+}
+
+.gradient-text:hover {
+  animation: glitch-intense 0.3s infinite;
+}
+
+@keyframes glitch-intense {
+  0% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 2px 0 #4A90E2, 2px -2px 0 #5fa3f5, 0 0 30px rgba(74, 144, 226, 0.5);
+  }
+  25% {
+    transform: translate(-2px, 2px);
+    text-shadow: 2px -2px 0 #5fa3f5, -2px 2px 0 #4A90E2, 0 0 30px rgba(95, 163, 245, 0.5);
+  }
+  50% {
+    transform: translate(2px, 2px);
+    text-shadow: -2px -2px 0 #4A90E2, 2px 2px 0 #5fa3f5, 0 0 30px rgba(74, 144, 226, 0.5);
+  }
+  75% {
+    transform: translate(-2px, -2px);
+    text-shadow: 2px 2px 0 #5fa3f5, -2px -2px 0 #4A90E2, 0 0 30px rgba(95, 163, 245, 0.5);
+  }
+  100% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 2px 0 #4A90E2, 2px -2px 0 #5fa3f5, 0 0 30px rgba(74, 144, 226, 0.5);
+  }
 }
 
 /* Glow effects */
