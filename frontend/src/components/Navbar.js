@@ -16,17 +16,18 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#4A90E2]/20" data-testid="navbar">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b-2 border-[#00d9ff]" data-testid="navbar" style={{ backgroundColor: 'rgba(13, 13, 15, 0.95)' }}>
+      <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" data-testid="nav-logo">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-all" data-testid="nav-logo">
             <img 
               src="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png" 
               alt="Redicate Logo" 
-              className="h-10 w-10 object-contain"
+              className="h-9 w-9 object-contain"
+              style={{ filter: 'drop-shadow(0 0 10px rgba(0, 217, 255, 0.5))' }}
             />
-            <h1 className="text-xl font-bold gradient-text">REDICATE</h1>
+            <h1 className="text-xl font-black gradient-text tracking-widest">REDICATE</h1>
           </Link>
 
           {/* Navigation Links */}
