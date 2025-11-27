@@ -20,19 +20,14 @@ const HeadAdminPanel = () => {
 
   const fetchMyTeam = async () => {
     try {
-      const response = await axios.get(`${API}/staff-teams`, { withCredentials: true });
-      // Find team where user is head admin
-      const team = response.data.find(t => t.head_admin_id === user.discord_id);
-      setMyTeam(team);
-      
-      if (team && team.members.length > 0) {
-        // Fetch team member details
-        const usersResponse = await axios.get(`${API}/users`, { withCredentials: true });
-        const members = usersResponse.data.filter(u => team.members.includes(u.discord_id));
-        setTeamMembers(members);
-      }
+      const response = await axios.get(`${API}/staff/my-team`, { withCredentials: true });
+      setMyTeam(response.data.team);
+      setTeamMembers(response.data.members || []);
     } catch (error) {
       console.error("Failed to fetch team", error);
+      if (error.response?.status === 404) {
+        setMyTeam(null);
+      }
     } finally {
       setLoading(false);
     }
