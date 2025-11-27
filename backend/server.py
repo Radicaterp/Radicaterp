@@ -606,12 +606,91 @@ async def update_report(report_id: str, update: ReportUpdate, user: User = Depen
     
     return {"success": True}
 
+# Staff Teams endpoints
+@api_router.get("/staff-teams", response_model=List[StaffTeam])
+async def get_staff_teams(user: User = Depends(require_admin)):
+    teams = await db.staff_teams.find({}, {"_id": 0}).to_list(1000)
+    return teams
+
+@api_router.post("/staff-teams", response_model=StaffTeam)
+async def create_staff_team(team_data: StaffTeamCreate, user: User = Depends(require_admin)):
+    # Verify head admin exists and has correct role
+    head_admin = await db.users.find_one({"discord_id": team_data.head_admin_id})
+    if not head_admin or head_admin.get("role") != "head_admin":
+        raise HTTPException(status_code=400, detail="Head admin not found or invalid role")
+    
+    team = StaffTeam(**team_data.model_dump())
+    await db.staff_teams.insert_one(team.model_dump())
+    return team
+
+@api_router.delete("/staff-teams/{team_id}")
+async def delete_staff_team(team_id: str, user: User = Depends(require_admin)):
+    result = await db.staff_teams.delete_one({"id": team_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return {"success": True}
+
+@api_router.post("/staff-teams/{team_id}/members/{discord_id}")
+async def remove_staff_member(team_id: str, discord_id: str, user: User = Depends(require_admin)):
+    await db.staff_teams.update_one(
+        {"id": team_id},
+        {"$pull": {"members": discord_id}}
+    )
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {"team_id": None}}
+    )
+    return {"success": True}
+
+# Manual staff addition
+@api_router.post("/add-staff")
+async def add_staff_member(staff_data: AddStaffMember, user: User = Depends(require_admin)):
+    # Check if user exists
+    existing_user = await db.users.find_one({"discord_id": staff_data.discord_id})
+    
+    if existing_user:
+        # Update existing user
+        await db.users.update_one(
+            {"discord_id": staff_data.discord_id},
+            {"$set": {"role": "staff", "team_id": staff_data.team_id}}
+        )
+    else:
+        # Create new user entry
+        new_user = User(
+            discord_id=staff_data.discord_id,
+            username=staff_data.username,
+            is_admin=True,
+            role="staff",
+            team_id=staff_data.team_id
+        )
+        await db.users.insert_one(new_user.model_dump())
+    
+    # Add to team
+    await db.staff_teams.update_one(
+        {"id": staff_data.team_id},
+        {"$addToSet": {"members": staff_data.discord_id}}
+    )
+    
+    # Get team info and notify head admin
+    team = await db.staff_teams.find_one({"id": staff_data.team_id}, {"_id": 0})
+    if team:
+        asyncio.create_task(
+            send_staff_assignment_dm(
+                team["head_admin_id"],
+                staff_data.username,
+                staff_data.discord_id,
+                team["name"]
+            )
+        )
+    
+    return {"success": True}
+
 # Staff endpoint
 @api_router.get("/staff")
 async def get_staff():
     staff = await db.users.find(
         {"is_admin": True},
-        {"_id": 0, "discord_id": 1, "username": 1, "avatar": 1, "is_admin": 1}
+        {"_id": 0, "discord_id": 1, "username": 1, "avatar": 1, "is_admin": 1, "role": 1}
     ).to_list(1000)
     return staff
 
