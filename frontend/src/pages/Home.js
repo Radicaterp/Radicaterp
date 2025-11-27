@@ -50,54 +50,48 @@ const Home = () => {
           </h1>
           <div className="h-1 w-64 mx-auto mb-6 bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent"></div>
           
-          <p className="text-2xl sm:text-3xl text-gray-300 mb-4 font-semibold">
-            FiveM Roleplay Server
+          <p className="text-xl sm:text-2xl text-[#00d9ff] mb-3 font-bold tracking-widest">
+            FIVEM ROLEPLAY
           </p>
           
-          <p className="text-lg sm:text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Oplev den ultimative roleplay oplevelse. Ansøg om whitelist jobs, bliv en del af vores community, og skriv din egen historie i Los Santos.
+          <p className="text-base sm:text-lg text-gray-400 mb-12 max-w-2xl mx-auto font-mono">
+            Dansk RP server | Whitelist jobs | Aktiv community | Seriøs roleplay
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             {!user ? (
               <>
-                <Button 
+                <button
                   onClick={handleLogin}
-                  size="lg"
-                  className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-10 py-7 rounded-xl font-bold glow-hover"
+                  className="cyber-btn cyber-btn-primary text-lg px-12 py-4"
                   data-testid="hero-login-button"
                 >
-                  Kom i Gang
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="lg"
+                  [ LOG IND ]
+                </button>
+                <button
                   onClick={() => navigate("/about")}
-                  className="border-2 border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 text-xl px-10 py-7 rounded-xl font-bold"
+                  className="cyber-btn text-lg px-12 py-4"
                   data-testid="about-button"
                 >
-                  Lær Mere
-                </Button>
+                  [ INFO ]
+                </button>
               </>
             ) : (
               <>
-                <Button 
+                <button
                   onClick={() => navigate("/applications")}
-                  size="lg"
-                  className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-10 py-7 rounded-xl font-bold glow-hover"
+                  className="cyber-btn cyber-btn-primary text-lg px-12 py-4"
                   data-testid="applications-button"
                 >
-                  Se Ansøgninger
-                </Button>
-                <Button 
+                  [ ANSØGNINGER ]
+                </button>
+                <button
                   onClick={() => navigate("/my-applications")}
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 text-xl px-10 py-7 rounded-xl font-bold"
+                  className="cyber-btn text-lg px-12 py-4"
                   data-testid="my-applications-button"
                 >
-                  Mine Ansøgninger
-                </Button>
+                  [ MINE ANS. ]
+                </button>
               </>
             )}
           </div>
