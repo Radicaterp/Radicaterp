@@ -115,59 +115,61 @@ const Home = () => {
       </div>
 
       {/* Features Section */}
-      <div className="relative z-10 py-24 px-6 bg-gradient-to-b from-transparent to-[#0a0a0b]">
+      <div className="relative z-10 py-24 px-6 diagonal-bg">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl sm:text-6xl font-bold text-center mb-4 gradient-text">
-            Hvorfor Redicate?
-          </h2>
-          <p className="text-center text-gray-400 text-lg mb-16">Alt du har brug for i én server</p>
+          <div className="mb-16 text-center">
+            <h2 className="text-5xl sm:text-6xl font-black mb-2 gradient-text tracking-wider">
+              SERVER FEATURES
+            </h2>
+            <div className="h-1 w-48 mx-auto bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent"></div>
+          </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-jobs">
-              <div className="text-5xl mb-4">👮</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Whitelist Jobs</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Politi, EMS, Mekaniker og meget mere. Professionelle jobs med dedikeret træning.
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-jobs">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; WHITELIST_JOBS</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">Politi • EMS • Mekaniker</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Professionelle jobs med træning og progression. Dedikeret ledelse og struktur.
               </p>
             </div>
 
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-gangs">
-              <div className="text-5xl mb-4">🔫</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Bande System</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Opret eller join eksisterende bander. Territorie krige og organiseret kriminalitet.
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-gangs">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; GANG_SYSTEM</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">Territorier • Krige • Crew</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Byg dit imperium. Kæmp om territorier. Organiseret kriminalitet og street beef.
               </p>
             </div>
 
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-economy">
-              <div className="text-5xl mb-4">💰</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Økonomi System</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Realistisk økonomi med jobs, businesses og illegal aktivitet. Byg din formue.
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-economy">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; ECONOMY</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">Legal • Illegal • Business</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Realistisk økonomi. Byg din formue gennem legit eller dirty money.
               </p>
             </div>
 
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-custom">
-              <div className="text-5xl mb-4">🚗</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Custom Køretøjer</h3>
-              <p className="text-gray-400 leading-relaxed">
-                100+ custom køretøjer. Fra supercars til motorcykler. Alle optimeret.
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-custom">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; CUSTOM_VEHICLES</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">100+ Biler • Tuning</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Supercars, bikes, trucks. Alle optimeret. Full tuning muligheder.
               </p>
             </div>
 
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-staff">
-              <div className="text-5xl mb-4">⚙️</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Dedikeret Staff</h3>
-              <p className="text-gray-400 leading-relaxed">
-                24/7 staff support. Hurtig respons på reports. Fair og konsistent håndtering.
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-staff">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; STAFF_SUPPORT</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">24/7 • Fair • Aktiv</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Dedikeret staff team. Hurtig respons. Konsistent håndtering af regler.
               </p>
             </div>
 
-            <div className="feature-card glass-card p-8 rounded-2xl hover-lift" data-testid="feature-updates">
-              <div className="text-5xl mb-4">🎉</div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Regelmæssige Updates</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Nye features hver uge. Community feedback bliver lyttet til og implementeret.
+            <div className="feature-card glass-card corner-cut p-6 hover-lift" data-testid="feature-updates">
+              <div className="text-[#00d9ff] font-mono text-sm mb-2 tracking-wider">&gt; DEVELOPMENT</div>
+              <h3 className="text-xl font-bold mb-3 text-white uppercase">Updates • Events • Patches</h3>
+              <p className="text-gray-400 text-sm font-mono leading-relaxed">
+                Konstant udvikling. Community feedback. Nye features hver uge.
               </p>
             </div>
           </div>
