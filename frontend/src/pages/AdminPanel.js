@@ -307,6 +307,98 @@ const AdminPanel = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="reports" className="space-y-4" data-testid="reports-content">
+            {pendingReports.length === 0 ? (
+              <div className="glass-card p-12 rounded-2xl text-center">
+                <p className="text-gray-400 text-lg">Ingen afventende rapporter</p>
+              </div>
+            ) : (
+              pendingReports.map((report) => (
+                <div key={report.id} className="glass-card p-6 rounded-xl border-2 border-red-500/30" data-testid={`pending-report-${report.id}`}>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Rapporteret: {report.reported_player}</h3>
+                      <p className="text-red-400">{report.report_type}</p>
+                      <p className="text-sm text-gray-500">
+                        Rapporteret af: {report.reporter_username} | Indsendt: {new Date(report.submitted_at).toLocaleDateString("da-DK")}
+                      </p>
+                    </div>
+                    <span className="text-yellow-500 font-semibold">⏳ Afventer</span>
+                  </div>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10"
+                        onClick={() => setSelectedReport(report)}
+                        data-testid={`view-report-${report.id}`}
+                      >
+                        Se Detaljer & Behandl
+                      </Button>
+                    </DialogTrigger>
+                    {selectedReport && selectedReport.id === report.id && (
+                      <DialogContent className="bg-[#1a1a1b] border-[#4A90E2]/30 text-white max-w-3xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="text-2xl gradient-text">
+                            Rapport: {selectedReport.reported_player}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                          <div>
+                            <h4 className="font-semibold text-[#4A90E2] mb-1">Rapporteret spiller:</h4>
+                            <p className="text-gray-300">{selectedReport.reported_player}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-[#4A90E2] mb-1">Type:</h4>
+                            <p className="text-gray-300">{selectedReport.report_type}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-[#4A90E2] mb-1">Beskrivelse:</h4>
+                            <p className="text-gray-300 whitespace-pre-wrap">{selectedReport.description}</p>
+                          </div>
+                          {selectedReport.evidence && (
+                            <div>
+                              <h4 className="font-semibold text-[#4A90E2] mb-1">Bevis:</h4>
+                              <p className="text-gray-300 whitespace-pre-wrap break-all">{selectedReport.evidence}</p>
+                            </div>
+                          )}
+                          <div>
+                            <h4 className="font-semibold text-[#4A90E2] mb-1">Rapporteret af:</h4>
+                            <p className="text-gray-300">{selectedReport.reporter_username}</p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3 pt-4">
+                            <Button
+                              onClick={() => handleReportUpdate(selectedReport.id, "investigating", "Undersøges af staff")}
+                              className="bg-blue-600 hover:bg-blue-700"
+                              data-testid="investigating-button"
+                            >
+                              🔍 Undersøg
+                            </Button>
+                            <Button
+                              onClick={() => handleReportUpdate(selectedReport.id, "resolved", "Situation håndteret")}
+                              className="bg-green-600 hover:bg-green-700"
+                              data-testid="resolve-button"
+                            >
+                              ✅ Afslut
+                            </Button>
+                            <Button
+                              onClick={() => handleReportUpdate(selectedReport.id, "dismissed", "Rapporten blev afvist")}
+                              className="bg-red-600 hover:bg-red-700"
+                              data-testid="dismiss-button"
+                            >
+                              ❌ Afvis
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    )}
+                  </Dialog>
+                </div>
+              ))
+            )}
+          </TabsContent>
+
           <TabsContent value="types" className="space-y-4" data-testid="types-content">
             {applicationTypes.map((type) => (
               <div key={type.id} className="glass-card p-6 rounded-xl" style={{ borderColor: type.color }} data-testid={`type-card-${type.id}`}>
