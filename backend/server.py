@@ -483,11 +483,13 @@ class User(BaseModel):
     avatar: Optional[str] = None
     is_admin: bool = False
     is_head_admin: bool = False
-    role: Optional[str] = "player"  # player, staff, head_admin, super_admin
+    role: Optional[str] = "player"  # player, staff, head_admin, super_admin, staff_member
     team_id: Optional[str] = None  # Staff team ID
     staff_rank: Optional[str] = "mod_elev"  # mod_elev, moderator, administrator, senior_admin
     strikes: int = 0
     notes: List[dict] = []  # [{text: str, added_by: str, added_at: str}]
+    on_probation: bool = False  # True if in probation period
+    probation_end_date: Optional[str] = None  # ISO datetime when probation ends
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class StaffTeam(BaseModel):
