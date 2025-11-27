@@ -81,6 +81,17 @@ const Navbar = () => {
                     Admin
                   </Link>
                 )}
+                {user.is_head_admin && (
+                  <Link 
+                    to="/head-admin" 
+                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                      isActive("/head-admin") ? "text-[#4A90E2]" : ""
+                    }`}
+                    data-testid="nav-head-admin"
+                  >
+                    Head Admin
+                  </Link>
+                )}
               </>
             )}
             
