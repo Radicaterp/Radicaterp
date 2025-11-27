@@ -972,15 +972,17 @@ async def review_application(
     
     # If approved and it's a staff application
     if review.status == "approved" and application["application_type_name"].lower() == "staff":
-        # Find a team to assign (use provided team_id or randomly assign to one of the teams)
+        # Find a team to assign (use provided team_id or assign to team with fewest members)
         if team_id:
             assigned_team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
         else:
-            # Get all teams and randomly assign
+            # Get all teams and assign to the one with fewest members
             all_teams = await db.staff_teams.find({}, {"_id": 0}).to_list(None)
             if all_teams:
-                assigned_team = random.choice(all_teams)
-                print(f"🎲 Randomly assigned to team: {assigned_team['name']}")
+                # Sort teams by member count (fewest first)
+                all_teams.sort(key=lambda t: len(t.get('members', [])))
+                assigned_team = all_teams[0]
+                print(f"⚖️ Assigned to team with fewest members: {assigned_team['name']} ({len(assigned_team.get('members', []))} members)")
             else:
                 assigned_team = None
                 print("⚠️ No teams available for assignment")
