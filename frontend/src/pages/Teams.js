@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const Teams = () => {
   const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
