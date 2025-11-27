@@ -497,7 +497,8 @@ async def review_application(
     app_id: str, 
     review: ApplicationReview, 
     background_tasks: BackgroundTasks,
-    user: User = Depends(require_admin)
+    user: User = Depends(require_admin),
+    team_id: Optional[str] = None
 ):
     application = await db.applications.find_one({"id": app_id}, {"_id": 0})
     if not application:
@@ -512,6 +513,33 @@ async def review_application(
             "reviewed_at": datetime.now(timezone.utc).isoformat()
         }}
     )
+    
+    # If approved and it's a staff application
+    if review.status == "approved" and application["application_type_name"].lower() == "staff":
+        # Update user role to staff
+        await db.users.update_one(
+            {"discord_id": application["user_id"]},
+            {"$set": {"role": "staff", "team_id": team_id}}
+        )
+        
+        # If team assigned, add to team and notify head admin
+        if team_id:
+            team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
+            if team:
+                # Add member to team
+                await db.staff_teams.update_one(
+                    {"id": team_id},
+                    {"$addToSet": {"members": application["user_id"]}}
+                )
+                
+                # Send guide to head admin
+                background_tasks.add_task(
+                    send_staff_assignment_dm,
+                    team["head_admin_id"],
+                    application["username"],
+                    application["user_id"],
+                    team["name"]
+                )
     
     # Send Discord embed in background
     background_tasks.add_task(
