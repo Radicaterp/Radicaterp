@@ -523,7 +523,7 @@ async def discord_callback(code: str, response: Response):
             samesite="lax"
         )
         
-        return {"success": True, "discord_id": discord_id}
+        return RedirectResponse(url=os.environ.get("CORS_ORIGINS", "https://distinguished-miracle-production.up.railway.app"))
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: User = Depends(require_auth)):
