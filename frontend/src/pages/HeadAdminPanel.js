@@ -37,9 +37,8 @@ const HeadAdminPanel = () => {
     if (!window.confirm("Er du sikker på du vil fjerne dette medlem fra teamet?")) return;
     
     try {
-      await axios.post(
-        `${API}/staff-teams/${myTeam.id}/members/${memberId}`,
-        {},
+      await axios.delete(
+        `${API}/staff/my-team/members/${memberId}`,
         { withCredentials: true }
       );
       toast.success("Medlem fjernet fra teamet");
