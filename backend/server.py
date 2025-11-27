@@ -518,6 +518,7 @@ async def discord_callback(code: str, response: Response):
         response.set_cookie(
             key="session_token",
             value=session_token,
+            domain=".redicate.dk",
             httponly=True,
             secure=True,
             max_age=7 * 24 * 60 * 60,
