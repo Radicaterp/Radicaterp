@@ -59,33 +59,85 @@ const Navbar = () => {
             
             {user && (
               <>
-                <Link 
-                  to="/applications" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/applications") ? "text-[#4A90E2]" : ""
-                  }`}
-                  data-testid="nav-applications"
-                >
-                  Ansøg
-                </Link>
-                <Link 
-                  to="/my-applications" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/my-applications") ? "text-[#4A90E2]" : ""
-                  }`}
-                  data-testid="nav-my-applications"
-                >
-                  Mine Ansøgninger
-                </Link>
-                <Link 
-                  to="/report" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/report") ? "text-[#4A90E2]" : ""
-                  }`}
-                  data-testid="nav-report"
-                >
-                  Rapportér
-                </Link>
+                {/* Ansøgninger Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setApplicationDropdownOpen(!applicationDropdownOpen)}
+                    onBlur={() => setTimeout(() => setApplicationDropdownOpen(false), 200)}
+                    className={`flex items-center gap-1 font-medium transition-colors ${
+                      isApplicationRouteActive() ? "text-[#4A90E2]" : "text-gray-300 hover:text-[#4A90E2]"
+                    }`}
+                    data-testid="nav-applications-dropdown"
+                  >
+                    Ansøgninger
+                    <ChevronDown className={`w-4 h-4 transition-transform ${applicationDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {applicationDropdownOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 glass-card rounded-lg border border-[#4A90E2]/30 shadow-xl overflow-hidden">
+                      <Link
+                        to="/applications"
+                        onClick={() => setApplicationDropdownOpen(false)}
+                        className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                          isActive("/applications") ? "bg-[#4A90E2]/30" : ""
+                        }`}
+                      >
+                        <div className="font-medium">Ansøg</div>
+                        <div className="text-xs text-gray-400">Indsend ny ansøgning</div>
+                      </Link>
+                      <Link
+                        to="/my-applications"
+                        onClick={() => setApplicationDropdownOpen(false)}
+                        className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                          isActive("/my-applications") ? "bg-[#4A90E2]/30" : ""
+                        }`}
+                      >
+                        <div className="font-medium">Mine Ansøgninger</div>
+                        <div className="text-xs text-gray-400">Se dine ansøgninger</div>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                {/* Rapporter Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setReportDropdownOpen(!reportDropdownOpen)}
+                    onBlur={() => setTimeout(() => setReportDropdownOpen(false), 200)}
+                    className={`flex items-center gap-1 font-medium transition-colors ${
+                      isReportRouteActive() ? "text-[#4A90E2]" : "text-gray-300 hover:text-[#4A90E2]"
+                    }`}
+                    data-testid="nav-reports-dropdown"
+                  >
+                    Rapporter
+                    <ChevronDown className={`w-4 h-4 transition-transform ${reportDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {reportDropdownOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 glass-card rounded-lg border border-[#4A90E2]/30 shadow-xl overflow-hidden">
+                      <Link
+                        to="/report"
+                        onClick={() => setReportDropdownOpen(false)}
+                        className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                          isActive("/report") ? "bg-[#4A90E2]/30" : ""
+                        }`}
+                      >
+                        <div className="font-medium">Rapportér</div>
+                        <div className="text-xs text-gray-400">Indsend rapport</div>
+                      </Link>
+                      <Link
+                        to="/my-reports"
+                        onClick={() => setReportDropdownOpen(false)}
+                        className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                          isActive("/my-reports") ? "bg-[#4A90E2]/30" : ""
+                        }`}
+                      >
+                        <div className="font-medium">Mine Rapporter</div>
+                        <div className="text-xs text-gray-400">Se dine rapporter</div>
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 
                 {/* Admin Dropdown */}
                 {(user.is_admin || user.is_head_admin) && (
