@@ -1,8 +1,9 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../App";
+import { AuthContext, API } from "../App";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import axios from "axios";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -15,6 +16,15 @@ const Navbar = () => {
   const handleLogout = async () => {
     await logout();
     navigate("/");
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.get(`${API}/auth/login`);
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Login failed", error);
+    }
   };
 
   const isActive = (path) => location.pathname === path;
