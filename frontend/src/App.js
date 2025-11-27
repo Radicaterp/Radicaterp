@@ -1,20 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
 import Applications from "./pages/Applications";
+import MyApplications from "./pages/MyApplications";
 import AdminPanel from "./pages/AdminPanel";
-import OwnerPanel from "./pages/OwnerPanel";
-import Teams from "./pages/Teams";
+import About from "./pages/About";
 import AuthCallback from "./pages/AuthCallback";
 import { Toaster } from "@/components/ui/sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
-export const AuthContext = React.createContext(null);
+export const AuthContext = createContext(null);
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,7 +46,7 @@ function App() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
-        <div className="text-[#4A90E2] text-xl">Loading...</div>
+        <div className="text-[#4A90E2] text-xl">Indlæser...</div>
       </div>
     );
   }
@@ -60,32 +59,19 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route
-              path="/dashboard"
-              element={user ? <Dashboard /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/teams"
-              element={user ? <Teams /> : <Navigate to="/" />}
-            />
+            <Route path="/about" element={<About />} />
             <Route
               path="/applications"
               element={user ? <Applications /> : <Navigate to="/" />}
             />
             <Route
-              path="/admin"
-              element={
-                user && ["head_admin", "owner"].includes(user.role) ? (
-                  <AdminPanel />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
+              path="/my-applications"
+              element={user ? <MyApplications /> : <Navigate to="/" />}
             />
             <Route
-              path="/owner"
+              path="/admin"
               element={
-                user && user.role === "owner" ? <OwnerPanel /> : <Navigate to="/" />
+                user && user.is_admin ? <AdminPanel /> : <Navigate to="/" />
               }
             />
           </Routes>
@@ -95,5 +81,4 @@ function App() {
   );
 }
 
-import React from "react";
 export default App;
