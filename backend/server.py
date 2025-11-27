@@ -530,19 +530,14 @@ async def discord_callback(code: str, response: Response):
             key="session_token",
             value=session_token,
             domain=".redicate.dk",
-            path="/",
             httponly=True,
             secure=True,
             max_age=7 * 24 * 60 * 60,
-            samesite="lax"
+            samesite="none"
         )
         
-        # Simple redirect back to frontend
-        frontend_url = os.environ.get("CORS_ORIGINS", "https://www.redicate.dk")
-        if frontend_url == "*":
-            frontend_url = "https://www.redicate.dk"
-        
-        return RedirectResponse(url=frontend_url)
+        # Redirect back to frontend
+        return RedirectResponse(url="https://www.redicate.dk")
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: User = Depends(require_auth)):
