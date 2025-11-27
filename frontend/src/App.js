@@ -18,6 +18,9 @@ import { Toaster } from "@/components/ui/sonner";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
+// Configure axios defaults to always send credentials
+axios.defaults.withCredentials = true;
+
 export const AuthContext = createContext(null);
 
 function App() {
