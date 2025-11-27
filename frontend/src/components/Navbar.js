@@ -9,6 +9,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const [applicationDropdownOpen, setApplicationDropdownOpen] = useState(false);
+  const [reportDropdownOpen, setReportDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -19,6 +21,14 @@ const Navbar = () => {
   
   const isAdminRouteActive = () => {
     return isActive("/admin") || isActive("/head-admin") || isActive("/super-admin");
+  };
+  
+  const isApplicationRouteActive = () => {
+    return isActive("/applications") || isActive("/my-applications");
+  };
+  
+  const isReportRouteActive = () => {
+    return isActive("/report") || isActive("/my-reports");
   };
 
   return (
