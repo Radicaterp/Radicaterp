@@ -12,7 +12,23 @@ const Home = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.get(`${API}/auth/login`);
-      window.location.href = response.data.url;
+      
+      // Open Discord OAuth in popup
+      const popup = window.open(
+        response.data.url,
+        'Discord Login',
+        'width=500,height=700,left=200,top=100'
+      );
+      
+      // Check for popup close and refresh user
+      const checkPopup = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkPopup);
+          // Reload page to get user data
+          window.location.reload();
+        }
+      }, 500);
+      
     } catch (error) {
       console.error("Login failed", error);
     }
