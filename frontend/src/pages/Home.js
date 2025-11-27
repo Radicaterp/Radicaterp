@@ -40,7 +40,10 @@ const Home = () => {
             />
           </div>
           
-          <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 gradient-text tracking-tight">
+          <h1 
+            className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 gradient-text glitch-text tracking-tight" 
+            data-text="REDICATE"
+          >
             REDICATE
           </h1>
           
