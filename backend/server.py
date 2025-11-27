@@ -1051,11 +1051,23 @@ async def add_strike(discord_id: str, strike_data: AddStrikeRequest, user: User 
     
     # If 3 strikes, notify for firing
     if new_strikes >= 3:
+        # Get all strikes for this staff member
+        updated_staff = await db.users.find_one({"discord_id": discord_id}, {"_id": 0})
+        strikes_list = []
+        for note in updated_staff.get("notes", []):
+            if "Strike" in note.get("text", ""):
+                strikes_list.append({
+                    "reason": note["text"],
+                    "added_by": note["added_by"],
+                    "added_at": note["added_at"]
+                })
+        
         await notify_firing_request(
             staff["username"],
             discord_id,
             user.username,
-            f"3 strikes opnået. Sidste strike: {strike_data.reason}"
+            user.discord_id,
+            strikes_list
         )
     
     return {"success": True, "strikes": new_strikes, "requires_firing": new_strikes >= 3}
