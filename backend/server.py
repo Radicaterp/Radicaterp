@@ -1368,6 +1368,102 @@ async def get_all_users(user: User = Depends(require_admin)):
     users = await db.users.find({}, {"_id": 0}).to_list(10000)
     return users
 
+# FiveM Admin Panel Endpoints
+FIVEM_SERVER_IP = "45.84.198.57"
+FIVEM_SERVER_PORT = "30120"
+
+@api_router.get("/fivem/players")
+async def get_fivem_players(user: User = Depends(require_admin)):
+    """Get online players from FiveM server"""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/players.json")
+            players = response.json()
+            return {"players": players}
+    except Exception as e:
+        print(f"Error fetching FiveM players: {e}")
+        return {"players": []}
+
+@api_router.post("/fivem/kick")
+async def kick_player(data: dict, user: User = Depends(require_admin)):
+    """Kick a player from the server"""
+    player_id = data.get("player_id")
+    reason = data.get("reason", "Kicked by admin")
+    
+    # Send command to FiveM server
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/kick",
+                json={"player_id": player_id, "reason": reason, "admin": user.username}
+            )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to kick player: {str(e)}")
+
+@api_router.post("/fivem/ban")
+async def ban_player(data: dict, user: User = Depends(require_admin)):
+    """Ban a player from the server"""
+    player_id = data.get("player_id")
+    reason = data.get("reason", "Banned by admin")
+    duration = data.get("duration", 0)
+    
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/ban",
+                json={"player_id": player_id, "reason": reason, "duration": duration, "admin": user.username}
+            )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to ban player: {str(e)}")
+
+@api_router.post("/fivem/teleport")
+async def teleport_player(data: dict, user: User = Depends(require_admin)):
+    """Teleport a player"""
+    player_id = data.get("player_id")
+    coordinates = data.get("coordinates")
+    
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/teleport",
+                json={"player_id": player_id, "coordinates": coordinates, "admin": user.username}
+            )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to teleport player: {str(e)}")
+
+@api_router.post("/fivem/heal")
+async def heal_player(data: dict, user: User = Depends(require_admin)):
+    """Heal a player"""
+    player_id = data.get("player_id")
+    
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/heal",
+                json={"player_id": player_id, "admin": user.username}
+            )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to heal player: {str(e)}")
+
+@api_router.post("/fivem/announce")
+async def send_announcement(data: dict, user: User = Depends(require_admin)):
+    """Send announcement to all players"""
+    message = data.get("message")
+    
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/announce",
+                json={"message": message, "admin": user.username}
+            )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send announcement: {str(e)}")
+
 # Include router
 app.include_router(api_router)
 
