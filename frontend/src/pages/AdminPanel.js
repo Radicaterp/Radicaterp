@@ -14,8 +14,10 @@ const AdminPanel = () => {
   const { user } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [applicationTypes, setApplicationTypes] = useState([]);
+  const [reports, setReports] = useState([]);
   const [stats, setStats] = useState(null);
   const [selectedApp, setSelectedApp] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
   const [newAppType, setNewAppType] = useState({
     name: "",
     description: "",
@@ -34,6 +36,7 @@ const AdminPanel = () => {
   useEffect(() => {
     fetchApplications();
     fetchApplicationTypes();
+    fetchReports();
     fetchStats();
   }, []);
 
