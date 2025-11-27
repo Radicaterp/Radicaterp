@@ -271,6 +271,12 @@ async def require_admin(request: Request) -> User:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+async def require_head_admin(request: Request) -> User:
+    user = await require_auth(request)
+    if not user.is_head_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
 async def check_discord_role(access_token: str) -> tuple[bool, str]:
     """Check user's Discord role and return (is_admin, role_type)"""
     try:
