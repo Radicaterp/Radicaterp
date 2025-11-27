@@ -675,15 +675,18 @@ async def review_application(
             # Auto-assign to first available team
             assigned_team = await db.staff_teams.find_one({}, {"_id": 0})
         
-        # Update user role to staff with starting rank
+        # Update user role to staff_member with starting rank
+        # NOTE: They get staff_member role, NOT admin access
         await db.users.update_one(
             {"discord_id": application["user_id"]},
             {"$set": {
-                "role": "staff",
+                "role": "staff_member",
                 "staff_rank": "mod_elev",
                 "strikes": 0,
                 "notes": [],
-                "team_id": assigned_team["id"] if assigned_team else None
+                "team_id": assigned_team["id"] if assigned_team else None,
+                "is_admin": False,
+                "is_head_admin": False
             }}
         )
         
