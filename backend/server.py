@@ -643,30 +643,50 @@ async def review_application(
     
     # If approved and it's a staff application
     if review.status == "approved" and application["application_type_name"].lower() == "staff":
-        # Update user role to staff
+        # Find a team to assign (use provided team_id or find first available team)
+        assigned_team = None
+        if team_id:
+            assigned_team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
+        else:
+            # Auto-assign to first available team
+            assigned_team = await db.staff_teams.find_one({}, {"_id": 0})
+        
+        # Update user role to staff with starting rank
         await db.users.update_one(
             {"discord_id": application["user_id"]},
-            {"$set": {"role": "staff", "team_id": team_id}}
+            {"$set": {
+                "role": "staff",
+                "staff_rank": "mod_elev",
+                "strikes": 0,
+                "notes": [],
+                "team_id": assigned_team["id"] if assigned_team else None
+            }}
+        )
+        
+        # Add Discord roles (perm staff + mod_elev rank)
+        background_tasks.add_task(
+            update_discord_roles,
+            application["user_id"],
+            "mod_elev",
+            False
         )
         
         # If team assigned, add to team and notify head admin
-        if team_id:
-            team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
-            if team:
-                # Add member to team
-                await db.staff_teams.update_one(
-                    {"id": team_id},
-                    {"$addToSet": {"members": application["user_id"]}}
-                )
-                
-                # Send guide to head admin
-                background_tasks.add_task(
-                    send_staff_assignment_dm,
-                    team["head_admin_id"],
-                    application["username"],
-                    application["user_id"],
-                    team["name"]
-                )
+        if assigned_team:
+            # Add member to team
+            await db.staff_teams.update_one(
+                {"id": assigned_team["id"]},
+                {"$addToSet": {"members": application["user_id"]}}
+            )
+            
+            # Send guide to head admin via Discord DM
+            background_tasks.add_task(
+                send_staff_assignment_dm,
+                assigned_team["head_admin_id"],
+                application["username"],
+                application["user_id"],
+                assigned_team["name"]
+            )
     
     # Send Discord embed in background
     background_tasks.add_task(
