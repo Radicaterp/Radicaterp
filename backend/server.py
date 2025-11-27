@@ -269,15 +269,32 @@ async def update_discord_roles(discord_id: str, new_rank: str, remove_all_ranks:
         traceback.print_exc()
         return False
 
-async def notify_firing_request(staff_username: str, staff_id: str, head_admin: str, reason: str):
-    """Notify approver role about firing request"""
+async def notify_firing_request(staff_username: str, staff_id: str, head_admin_username: str, head_admin_id: str, strikes: List[dict]):
+    """Notify approver role about firing request with interactive buttons"""
     if not discord_bot_client or not discord_bot_ready:
         return
     
     try:
+        # Create firing request in database
+        firing_request = FiringRequest(
+            staff_id=staff_id,
+            staff_username=staff_username,
+            head_admin_id=head_admin_id,
+            head_admin_username=head_admin_username,
+            reason=f"{len(strikes)} strikes opnået",
+            strikes=strikes
+        )
+        await db.firing_requests.insert_one(firing_request.model_dump())
+        
         channel = discord_bot_client.get_channel(int(DISCORD_CHANNEL_ID))
         if not channel:
             return
+        
+        # Build strikes list
+        strikes_text = "\n".join([
+            f"**Strike {i+1}:** {s['reason']} (af {s['added_by']})" 
+            for i, s in enumerate(strikes)
+        ])
         
         embed = discord.Embed(
             title="⚠️ Fyring Anmodning",
@@ -285,15 +302,127 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin: 
             color=discord.Color.red(),
             timestamp=datetime.now(timezone.utc)
         )
-        embed.add_field(name="Staff Medlem", value=f"{staff_username} (<@{staff_id}>)", inline=True)
-        embed.add_field(name="Head Admin", value=head_admin, inline=True)
-        embed.add_field(name="Årsag", value=reason, inline=False)
-        embed.set_footer(text="Redicate RP Staff System")
+        embed.add_field(name="👤 Staff Medlem", value=f"{staff_username} (<@{staff_id}>)", inline=True)
+        embed.add_field(name="👮 Head Admin", value=f"{head_admin_username} (<@{head_admin_id}>)", inline=True)
+        embed.add_field(name="📊 Total Strikes", value=str(len(strikes)), inline=True)
+        embed.add_field(name="⚠️ Strikes Oversigt", value=strikes_text, inline=False)
+        embed.add_field(name="🆔 Request ID", value=f"`{firing_request.id}`", inline=False)
+        embed.set_footer(text="Redicate RP Staff System • Brug knapperne nedenfor")
         
-        await channel.send(embed=embed)
-        print(f"Sent firing request notification")
+        # Create buttons view
+        from discord.ui import View, Button
+        
+        class FiringApprovalView(View):
+            def __init__(self, request_id: str):
+                super().__init__(timeout=None)  # No timeout
+                self.request_id = request_id
+                
+                # Approve button
+                approve_btn = Button(
+                    label="✅ Godkend Fyring",
+                    style=discord.ButtonStyle.success,
+                    custom_id=f"firing_approve_{request_id}"
+                )
+                approve_btn.callback = self.approve_callback
+                self.add_item(approve_btn)
+                
+                # Reject button
+                reject_btn = Button(
+                    label="❌ Afvis Fyring",
+                    style=discord.ButtonStyle.danger,
+                    custom_id=f"firing_reject_{request_id}"
+                )
+                reject_btn.callback = self.reject_callback
+                self.add_item(reject_btn)
+            
+            async def approve_callback(self, interaction: discord.Interaction):
+                # Update firing request in database
+                await db.firing_requests.update_one(
+                    {"id": self.request_id},
+                    {"$set": {
+                        "status": "approved",
+                        "reviewed_by": str(interaction.user.id),
+                        "reviewed_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                # Get firing request details
+                firing_req = await db.firing_requests.find_one({"id": self.request_id}, {"_id": 0})
+                
+                # Fire the staff member (remove all roles)
+                await update_discord_roles(firing_req["staff_id"], None, True)
+                
+                # Update user in database
+                await db.users.update_one(
+                    {"discord_id": firing_req["staff_id"]},
+                    {"$set": {
+                        "role": "player",
+                        "is_admin": False,
+                        "is_head_admin": False,
+                        "team_id": None,
+                        "staff_rank": None
+                    }}
+                )
+                
+                # Update embed
+                embed = interaction.message.embeds[0]
+                embed.color = discord.Color.green()
+                embed.title = "✅ Fyring Godkendt"
+                embed.add_field(
+                    name="Godkendt af", 
+                    value=f"<@{interaction.user.id}>", 
+                    inline=False
+                )
+                
+                await interaction.response.edit_message(embed=embed, view=None)
+                await interaction.followup.send(
+                    f"✅ {firing_req['staff_username']} er blevet fyret og fjernet fra teamet.",
+                    ephemeral=True
+                )
+            
+            async def reject_callback(self, interaction: discord.Interaction):
+                # Update firing request in database
+                await db.firing_requests.update_one(
+                    {"id": self.request_id},
+                    {"$set": {
+                        "status": "rejected",
+                        "reviewed_by": str(interaction.user.id),
+                        "reviewed_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                firing_req = await db.firing_requests.find_one({"id": self.request_id}, {"_id": 0})
+                
+                # Update embed
+                embed = interaction.message.embeds[0]
+                embed.color = discord.Color.orange()
+                embed.title = "❌ Fyring Afvist"
+                embed.add_field(
+                    name="Afvist af", 
+                    value=f"<@{interaction.user.id}>", 
+                    inline=False
+                )
+                
+                await interaction.response.edit_message(embed=embed, view=None)
+                await interaction.followup.send(
+                    f"❌ Fyring anmodning for {firing_req['staff_username']} er blevet afvist.",
+                    ephemeral=True
+                )
+        
+        view = FiringApprovalView(firing_request.id)
+        message = await channel.send(embed=embed, view=view)
+        
+        # Save message ID for reference
+        await db.firing_requests.update_one(
+            {"id": firing_request.id},
+            {"$set": {"discord_message_id": str(message.id)}}
+        )
+        
+        print(f"Sent firing request notification with buttons for {staff_username}")
     except Exception as e:
         print(f"Failed to send firing notification: {e}")
+        import traceback
+        traceback.print_exc()
 
 # Models
 class User(BaseModel):
