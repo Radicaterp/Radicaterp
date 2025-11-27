@@ -20,7 +20,7 @@ const AuthCallback = () => {
       try {
         await axios.get(`${API}/auth/callback?code=${code}`, { withCredentials: true });
         await checkAuth();
-        navigate("/dashboard");
+        navigate("/my-applications");
       } catch (error) {
         console.error("Auth callback failed", error);
         navigate("/");
