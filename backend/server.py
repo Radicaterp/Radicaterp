@@ -166,6 +166,89 @@ God fornøjelse med dit nye team medlem! 🚀
     except Exception as e:
         print(f"Failed to send staff assignment DM: {e}")
 
+async def update_discord_roles(discord_id: str, new_rank: str, remove_all_ranks: bool = False):
+    """Update Discord roles for staff member"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready")
+        return False
+    
+    try:
+        guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
+        if not guild:
+            print(f"Guild {DISCORD_GUILD_ID} not found")
+            return False
+        
+        member = await guild.fetch_member(int(discord_id))
+        if not member:
+            print(f"Member {discord_id} not found")
+            return False
+        
+        # Remove all rank roles if specified (for firing)
+        if remove_all_ranks:
+            for role_id in RANK_TO_ROLE_ID.values():
+                role = guild.get_role(int(role_id))
+                if role and role in member.roles:
+                    await member.remove_roles(role)
+            
+            # Remove perm staff role
+            perm_role = guild.get_role(int(DISCORD_PERM_STAFF_ROLE_ID))
+            if perm_role and perm_role in member.roles:
+                await member.remove_roles(perm_role)
+            
+            print(f"Removed all staff roles from {discord_id}")
+            return True
+        
+        # Add perm staff role if not present
+        perm_role = guild.get_role(int(DISCORD_PERM_STAFF_ROLE_ID))
+        if perm_role and perm_role not in member.roles:
+            await member.add_roles(perm_role)
+        
+        # Remove all rank roles first
+        for role_id in RANK_TO_ROLE_ID.values():
+            role = guild.get_role(int(role_id))
+            if role and role in member.roles:
+                await member.remove_roles(role)
+        
+        # Add new rank role
+        new_role_id = RANK_TO_ROLE_ID.get(new_rank)
+        if new_role_id:
+            new_role = guild.get_role(int(new_role_id))
+            if new_role:
+                await member.add_roles(new_role)
+                print(f"Updated {discord_id} to rank {new_rank}")
+                return True
+        
+        return False
+    except Exception as e:
+        print(f"Failed to update Discord roles: {e}")
+        return False
+
+async def notify_firing_request(staff_username: str, staff_id: str, head_admin: str, reason: str):
+    """Notify approver role about firing request"""
+    if not discord_bot_client or not discord_bot_ready:
+        return
+    
+    try:
+        channel = discord_bot_client.get_channel(int(DISCORD_CHANNEL_ID))
+        if not channel:
+            return
+        
+        embed = discord.Embed(
+            title="⚠️ Fyring Anmodning",
+            description=f"<@&{DISCORD_FIRING_APPROVER_ROLE_ID}> En staff medlem skal godkendes til fyring",
+            color=discord.Color.red(),
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="Staff Medlem", value=f"{staff_username} (<@{staff_id}>)", inline=True)
+        embed.add_field(name="Head Admin", value=head_admin, inline=True)
+        embed.add_field(name="Årsag", value=reason, inline=False)
+        embed.set_footer(text="Redicate RP Staff System")
+        
+        await channel.send(embed=embed)
+        print(f"Sent firing request notification")
+    except Exception as e:
+        print(f"Failed to send firing notification: {e}")
+
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
