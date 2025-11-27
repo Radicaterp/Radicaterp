@@ -101,7 +101,28 @@ class User(BaseModel):
     username: str
     avatar: Optional[str] = None
     is_admin: bool = False
+    role: Optional[str] = "player"  # player, staff, head_admin, super_admin
+    team_id: Optional[str] = None  # Staff team ID
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class StaffTeam(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    head_admin_id: str  # Discord ID of head admin
+    members: List[str] = []  # Discord IDs of team members
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class StaffTeamCreate(BaseModel):
+    name: str
+    description: str
+    head_admin_id: str
+
+class AddStaffMember(BaseModel):
+    discord_id: str
+    username: str
+    team_id: str
 
 class ApplicationType(BaseModel):
     model_config = ConfigDict(extra="ignore")
