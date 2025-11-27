@@ -537,25 +537,12 @@ async def discord_callback(code: str, response: Response):
             samesite="lax"
         )
         
-        # Return HTML that closes popup and refreshes parent
-        html_content = """
-        <html>
-        <head><title>Login Success</title></head>
-        <body>
-        <script>
-        if (window.opener) {
-            window.opener.location.reload();
-            window.close();
-        } else {
-            window.location.href = '""" + os.environ.get("CORS_ORIGINS", "https://www.redicate.dk") + """';
-        }
-        </script>
-        <p>Login successful! Closing window...</p>
-        </body>
-        </html>
-        """
-        from fastapi.responses import HTMLResponse
-        return HTMLResponse(content=html_content)
+        # Simple redirect back to frontend
+        frontend_url = os.environ.get("CORS_ORIGINS", "https://www.redicate.dk")
+        if frontend_url == "*":
+            frontend_url = "https://www.redicate.dk"
+        
+        return RedirectResponse(url=frontend_url)
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: User = Depends(require_auth)):
