@@ -159,7 +159,23 @@ const AdminPanel = () => {
     }
   };
 
+  const handleReportUpdate = async (reportId, status, adminNotes) => {
+    try {
+      await axios.put(
+        `${API}/reports/${reportId}`,
+        { status, admin_notes: adminNotes },
+        { withCredentials: true }
+      );
+      toast.success(`Rapport ${status === "resolved" ? "afsluttet" : status === "investigating" ? "sat til undersøges" : "afvist"}!`);
+      fetchReports();
+      setSelectedReport(null);
+    } catch (error) {
+      toast.error("Kunne ikke opdatere rapport");
+    }
+  };
+
   const pendingApplications = applications.filter(app => app.status === "pending");
+  const pendingReports = reports.filter(rep => rep.status === "pending");
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] bg-grid">
