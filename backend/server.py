@@ -30,6 +30,7 @@ DISCORD_REDIRECT_URI = os.environ.get('DISCORD_REDIRECT_URI')
 DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 DISCORD_ADMIN_ROLE_ID = os.environ.get('DISCORD_ADMIN_ROLE_ID')
 DISCORD_GUILD_ID = os.environ.get('DISCORD_GUILD_ID')
+DISCORD_CHANNEL_ID = os.environ.get('DISCORD_CHANNEL_ID')
 DISCORD_API_ENDPOINT = 'https://discord.com/api/v10'
 
 # Session storage
