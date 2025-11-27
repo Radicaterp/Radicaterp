@@ -619,6 +619,26 @@ async def get_staff_teams(user: User = Depends(require_admin)):
     teams = await db.staff_teams.find({}, {"_id": 0}).to_list(1000)
     return teams
 
+@api_router.get("/staff/my-team")
+async def get_my_team(user: User = Depends(require_head_admin)):
+    """Get the team where current user is head admin"""
+    team = await db.staff_teams.find_one({"head_admin_id": user.discord_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="No team found for this head admin")
+    
+    # Get team member details
+    members = []
+    if team.get("members"):
+        members = await db.users.find(
+            {"discord_id": {"$in": team["members"]}},
+            {"_id": 0}
+        ).to_list(1000)
+    
+    return {
+        "team": team,
+        "members": members
+    }
+
 @api_router.post("/staff-teams", response_model=StaffTeam)
 async def create_staff_team(team_data: StaffTeamCreate, user: User = Depends(require_admin)):
     # Verify head admin exists and has correct role
