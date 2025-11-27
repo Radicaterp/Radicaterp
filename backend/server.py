@@ -910,7 +910,8 @@ async def review_application(
             assigned_team = await db.staff_teams.find_one({}, {"_id": 0})
         
         # Update user role to staff_member with starting rank
-        # NOTE: They get staff_member role, NOT admin access
+        # NOTE: They start with probation for 1 week
+        probation_end = datetime.now(timezone.utc) + timedelta(days=7)
         await db.users.update_one(
             {"discord_id": application["user_id"]},
             {"$set": {
@@ -920,16 +921,16 @@ async def review_application(
                 "notes": [],
                 "team_id": assigned_team["id"] if assigned_team else None,
                 "is_admin": False,
-                "is_head_admin": False
+                "is_head_admin": False,
+                "on_probation": True,
+                "probation_end_date": probation_end.isoformat()
             }}
         )
         
-        # Add Discord roles (perm staff + mod_elev rank)
+        # Add Discord probation role (not perm staff yet)
         background_tasks.add_task(
-            update_discord_roles,
-            application["user_id"],
-            "mod_elev",
-            False
+            give_probation_role,
+            application["user_id"]
         )
         
         # If team assigned, add to team and notify head admin
