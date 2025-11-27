@@ -96,6 +96,61 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
+async def send_staff_assignment_dm(head_admin_id: str, new_staff_username: str, new_staff_id: str, team_name: str):
+    """Send DM to head admin about new staff member with guide"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready")
+        return
+    
+    try:
+        # Get head admin user
+        head_admin = await discord_bot_client.fetch_user(int(head_admin_id))
+        if not head_admin:
+            print(f"Head admin {head_admin_id} not found")
+            return
+        
+        # Create embed with guide
+        embed = discord.Embed(
+            title="🎯 Nyt Staff Medlem på Dit Team!",
+            description=f"**{new_staff_username}** er blevet godkendt og tilføjet til **{team_name}**",
+            color=discord.Color.blue(),
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="Staff Medlem", value=f"<@{new_staff_id}>", inline=True)
+        embed.add_field(name="Discord ID", value=new_staff_id, inline=True)
+        embed.add_field(name="Team", value=team_name, inline=True)
+        
+        # Guide for head admin
+        guide_text = \"\"\"
+**📋 HVAD NU?**
+
+1️⃣ **Velkomst**: Tag kontakt til det nye staff medlem og byd dem velkommen
+2️⃣ **Træning**: Giv dem en intro til server regler og staff guidelines
+3️⃣ **Permissions**: Sørg for de har de rigtige roller i Discord
+4️⃣ **Shadowing**: Lad dem følge dig eller andre erfarne staff
+5️⃣ **First Tasks**: Start med simple opgaver som at svare på spørgsmål
+
+**⚙️ ANSVARSOMRÅDER**
+• Hjælp spillere med spørgsmål
+• Behandl reports
+• Overvåg server for regelbrydelser
+• Dokumentér vigtige situationer
+• Rapportér til dig som Head Admin
+
+**📞 SUPPORT**
+Hvis du har brug for hjælp til at træne dit team, kontakt Super Admins.
+
+God fornøjelse med dit nye team medlem! 🚀
+\"\"\"
+        
+        embed.add_field(name="Guide til Træning", value=guide_text, inline=False)
+        embed.set_footer(text="Redicate RP Staff System")
+        
+        await head_admin.send(embed=embed)
+        print(f"Sent staff assignment DM to head admin {head_admin_id}")
+    except Exception as e:
+        print(f"Failed to send staff assignment DM: {e}")
+
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
