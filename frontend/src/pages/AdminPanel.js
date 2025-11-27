@@ -225,6 +225,9 @@ const AdminPanel = () => {
             <TabsTrigger value="applications" className="data-[state=active]:bg-[#4A90E2]" data-testid="tab-applications">
               Ansøgninger ({pendingApplications.length})
             </TabsTrigger>
+            <TabsTrigger value="reports" className="data-[state=active]:bg-[#4A90E2]" data-testid="tab-reports">
+              Rapporter ({pendingReports.length})
+            </TabsTrigger>
             <TabsTrigger value="types" className="data-[state=active]:bg-[#4A90E2]" data-testid="tab-types">
               Ansøgningstyper
             </TabsTrigger>
