@@ -158,6 +158,7 @@ class User(BaseModel):
     username: str
     avatar: Optional[str] = None
     is_admin: bool = False
+    is_head_admin: bool = False
     role: Optional[str] = "player"  # player, staff, head_admin, super_admin
     team_id: Optional[str] = None  # Staff team ID
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
