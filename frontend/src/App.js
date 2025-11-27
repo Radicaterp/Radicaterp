@@ -88,6 +88,18 @@ function App() {
                 user && user.is_admin ? <AdminPanel /> : <Navigate to="/" />
               }
             />
+            <Route
+              path="/head-admin"
+              element={
+                user && user.is_head_admin ? <HeadAdminPanel /> : <Navigate to="/" />
+              }
+            />
+            <Route
+              path="/super-admin"
+              element={
+                user && user.is_admin ? <SuperAdminPanel /> : <Navigate to="/" />
+              }
+            />
           </Routes>
         </BrowserRouter>
       </div>
