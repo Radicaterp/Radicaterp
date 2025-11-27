@@ -191,11 +191,11 @@ const AdminPanel = () => {
 
         {/* Stats */}
         {stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-testid="admin-stats">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8" data-testid="admin-stats">
             <div className="glass-card p-6 rounded-xl">
               <div className="text-3xl mb-2">👥</div>
               <div className="text-3xl font-bold text-[#4A90E2]">{stats.total_users}</div>
-              <div className="text-gray-400">Totalt brugere</div>
+              <div className="text-gray-400">Brugere</div>
             </div>
             <div className="glass-card p-6 rounded-xl">
               <div className="text-3xl mb-2">📋</div>
@@ -205,12 +205,17 @@ const AdminPanel = () => {
             <div className="glass-card p-6 rounded-xl">
               <div className="text-3xl mb-2">⏳</div>
               <div className="text-3xl font-bold text-[#4A90E2]">{stats.pending_applications}</div>
-              <div className="text-gray-400">Afventende</div>
+              <div className="text-gray-400">Afventende Ans.</div>
             </div>
             <div className="glass-card p-6 rounded-xl">
               <div className="text-3xl mb-2">✅</div>
               <div className="text-3xl font-bold text-[#4A90E2]">{stats.approved_applications}</div>
               <div className="text-gray-400">Godkendte</div>
+            </div>
+            <div className="glass-card p-6 rounded-xl">
+              <div className="text-3xl mb-2">⚠️</div>
+              <div className="text-3xl font-bold text-red-500">{stats.pending_reports}</div>
+              <div className="text-gray-400">Rapporter</div>
             </div>
           </div>
         )}
