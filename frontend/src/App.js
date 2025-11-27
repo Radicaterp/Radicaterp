@@ -8,6 +8,9 @@ import MyApplications from "./pages/MyApplications";
 import AdminPanel from "./pages/AdminPanel";
 import About from "./pages/About";
 import AuthCallback from "./pages/AuthCallback";
+import Report from "./pages/Report";
+import MyReports from "./pages/MyReports";
+import Staff from "./pages/Staff";
 import { Toaster } from "@/components/ui/sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
