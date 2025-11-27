@@ -438,6 +438,68 @@ async def review_application(
     
     return {"success": True}
 
+# Report endpoints
+@api_router.get("/reports", response_model=List[Report])
+async def get_reports(user: User = Depends(require_auth)):
+    if user.is_admin:
+        reports = await db.reports.find({}, {"_id": 0}).to_list(1000)
+    else:
+        reports = await db.reports.find({"reporter_id": user.discord_id}, {"_id": 0}).to_list(1000)
+    
+    return reports
+
+@api_router.post("/reports", response_model=Report)
+async def create_report(report_data: ReportCreate, user: User = Depends(require_auth)):
+    report = Report(
+        reporter_id=user.discord_id,
+        reporter_username=user.username,
+        reported_player=report_data.reported_player,
+        report_type=report_data.report_type,
+        description=report_data.description,
+        evidence=report_data.evidence
+    )
+    
+    await db.reports.insert_one(report.model_dump())
+    return report
+
+@api_router.get("/reports/{report_id}", response_model=Report)
+async def get_report(report_id: str, user: User = Depends(require_auth)):
+    report = await db.reports.find_one({"id": report_id}, {"_id": 0})
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    if not user.is_admin and report["reporter_id"] != user.discord_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    return Report(**report)
+
+@api_router.put("/reports/{report_id}")
+async def update_report(report_id: str, update: ReportUpdate, user: User = Depends(require_admin)):
+    report = await db.reports.find_one({"id": report_id}, {"_id": 0})
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    await db.reports.update_one(
+        {"id": report_id},
+        {"$set": {
+            "status": update.status,
+            "admin_notes": update.admin_notes,
+            "handled_by": user.username,
+            "handled_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"success": True}
+
+# Staff endpoint
+@api_router.get("/staff")
+async def get_staff():
+    staff = await db.users.find(
+        {"is_admin": True},
+        {"_id": 0, "discord_id": 1, "username": 1, "avatar": 1, "is_admin": 1}
+    ).to_list(1000)
+    return staff
+
 # Stats endpoint
 @api_router.get("/stats")
 async def get_stats(user: User = Depends(require_admin)):
@@ -445,6 +507,7 @@ async def get_stats(user: User = Depends(require_admin)):
     total_app_types = await db.application_types.count_documents({"active": True})
     pending_apps = await db.applications.count_documents({"status": "pending"})
     approved_apps = await db.applications.count_documents({"status": "approved"})
+    pending_reports = await db.reports.count_documents({"status": "pending"})
     
     return {
         "total_users": total_users,
