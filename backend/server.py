@@ -169,19 +169,23 @@ God fornøjelse med dit nye team medlem! 🚀
 async def update_discord_roles(discord_id: str, new_rank: str, remove_all_ranks: bool = False):
     """Update Discord roles for staff member"""
     if not discord_bot_client or not discord_bot_ready:
-        print("Discord bot not ready")
+        print(f"❌ Discord bot not ready. Client: {discord_bot_client}, Ready: {discord_bot_ready}")
         return False
     
     try:
         guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
         if not guild:
-            print(f"Guild {DISCORD_GUILD_ID} not found")
+            print(f"❌ Guild {DISCORD_GUILD_ID} not found")
             return False
+        
+        print(f"✅ Found guild: {guild.name}")
         
         member = await guild.fetch_member(int(discord_id))
         if not member:
-            print(f"Member {discord_id} not found")
+            print(f"❌ Member {discord_id} not found in guild")
             return False
+        
+        print(f"✅ Found member: {member.name}")
         
         # Remove all rank roles if specified (for firing)
         if remove_all_ranks:
