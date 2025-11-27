@@ -84,26 +84,87 @@ const SuperAdminPanel = () => {
     }
   };
 
+  const tabs = [
+    { id: "teams", label: "Staff Teams", icon: "👥", count: staffTeams.length },
+    { id: "create", label: "Opret Team", icon: "➕" },
+    { id: "add-staff", label: "Tilføj Staff", icon: "👤" }
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] bg-grid">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-6 py-8 mt-24">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2 gradient-text" data-testid="super-admin-panel-title">
+        <div className="mb-6 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 gradient-text" data-testid="super-admin-panel-title">
             Admin Overview
           </h1>
-          <p className="text-gray-400 text-lg">Administrer alle staff teams og medlemmer</p>
+          <p className="text-gray-400">Administrer alle staff teams og medlemmer</p>
         </div>
 
-        <Tabs defaultValue="teams" className="space-y-6">
-          <TabsList className="bg-[#1a1a1b] border border-[#4A90E2]/20">
-            <TabsTrigger value="teams" className="data-[state=active]:bg-[#4A90E2]">Staff Teams ({staffTeams.length})</TabsTrigger>
-            <TabsTrigger value="create" className="data-[state=active]:bg-[#4A90E2]">Opret Team</TabsTrigger>
-            <TabsTrigger value="add-staff" className="data-[state=active]:bg-[#4A90E2]">Tilføj Staff</TabsTrigger>
-          </TabsList>
+        {/* Dropdown for mobile + Small tabs for desktop */}
+        <div className="mb-8">
+          {/* Mobile Dropdown */}
+          <div className="md:hidden relative">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-[#4A90E2] transition-all"
+            >
+              <span className="flex items-center gap-2">
+                <span>{tabs.find(t => t.id === activeTab)?.icon}</span>
+                <span className="font-semibold">{tabs.find(t => t.id === activeTab)?.label}</span>
+                {tabs.find(t => t.id === activeTab)?.count !== undefined && (
+                  <span className="text-[#4A90E2]">({tabs.find(t => t.id === activeTab)?.count})</span>
+                )}
+              </span>
+              <ChevronDown className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 glass-card rounded-xl overflow-hidden z-10 border border-[#4A90E2]/30">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full p-4 text-left flex items-center gap-2 hover:bg-[#4A90E2]/20 transition-all ${
+                      activeTab === tab.id ? 'bg-[#4A90E2]/30 text-[#4A90E2]' : 'text-white'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span className="font-medium">{tab.label}</span>
+                    {tab.count !== undefined && <span>({tab.count})</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <TabsContent value="teams" className="space-y-6">
+          {/* Desktop Small Tabs */}
+          <div className="hidden md:flex gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#4A90E2] text-white'
+                    : 'bg-[#1a1a1b] text-gray-400 hover:bg-[#4A90E2]/20 hover:text-white'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+                {tab.count !== undefined && <span>({tab.count})</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === "teams" && (
+          <div className="space-y-6 animate-fade-in">
             {staffTeams.map((team) => {
               const headAdmin = allUsers.find(u => u.discord_id === team.head_admin_id);
               const members = allUsers.filter(u => team.members.includes(u.discord_id));
