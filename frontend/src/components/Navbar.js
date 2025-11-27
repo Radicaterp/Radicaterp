@@ -229,7 +229,7 @@ const Navbar = () => {
               Om Os
             </Link>
 
-            {/* User Info & Logout */}
+            {/* User Info & Login/Logout */}
             {user ? (
               <div className="flex items-center gap-4 ml-4 pl-4 border-l border-[#4A90E2]/30">
                 <div className="text-right" data-testid="nav-user-info">
@@ -247,7 +247,18 @@ const Navbar = () => {
                   Log ud
                 </Button>
               </div>
-            ) : null}
+            ) : (
+              <div className="ml-4 pl-4 border-l border-[#4A90E2]/30">
+                <Button 
+                  onClick={handleLogin}
+                  size="sm"
+                  className="bg-[#4A90E2] hover:bg-[#5fa3f5] text-white"
+                  data-testid="login-button"
+                >
+                  Log ind
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
