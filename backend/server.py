@@ -519,8 +519,9 @@ async def discord_callback(code: str, response: Response):
             key="session_token",
             value=session_token,
             httponly=True,
+            secure=True,
             max_age=7 * 24 * 60 * 60,
-            samesite="lax"
+            samesite="none"
         )
         
         return RedirectResponse(url=os.environ.get("CORS_ORIGINS", "https://distinguished-miracle-production.up.railway.app"))
