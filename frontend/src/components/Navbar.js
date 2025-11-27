@@ -61,6 +61,15 @@ const Navbar = () => {
                 >
                   Mine Ansøgninger
                 </Link>
+                <Link 
+                  to="/report" 
+                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                    isActive("/report") ? "text-[#4A90E2]" : ""
+                  }`}
+                  data-testid="nav-report"
+                >
+                  Rapportér
+                </Link>
                 {user.is_admin && (
                   <Link 
                     to="/admin" 
@@ -74,6 +83,16 @@ const Navbar = () => {
                 )}
               </>
             )}
+            
+            <Link 
+              to="/staff" 
+              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                isActive("/staff") ? "text-[#4A90E2]" : ""
+              }`}
+              data-testid="nav-staff"
+            >
+              Staff
+            </Link>
             
             <Link 
               to="/about" 
