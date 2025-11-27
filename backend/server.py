@@ -700,10 +700,12 @@ async def review_application(
         }}
     )
     
+    # Initialize assigned_team
+    assigned_team = None
+    
     # If approved and it's a staff application
     if review.status == "approved" and application["application_type_name"].lower() == "staff":
         # Find a team to assign (use provided team_id or find first available team)
-        assigned_team = None
         if team_id:
             assigned_team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
         else:
