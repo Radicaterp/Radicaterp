@@ -185,6 +185,15 @@ class AddStaffMember(BaseModel):
     username: str
     team_id: str
 
+class AddStrikeRequest(BaseModel):
+    reason: str
+
+class AddNoteRequest(BaseModel):
+    note: str
+
+class UpRankRequest(BaseModel):
+    new_rank: Literal["mod_elev", "moderator", "administrator", "senior_admin"]
+
 class ApplicationType(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
