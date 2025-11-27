@@ -770,6 +770,108 @@ async def remove_my_team_member(discord_id: str, user: User = Depends(require_he
     
     return {"success": True}
 
+# Staff Management Endpoints (Strikes, Notes, Uprank)
+@api_router.post("/staff/my-team/members/{discord_id}/strike")
+async def add_strike(discord_id: str, strike_data: AddStrikeRequest, user: User = Depends(require_head_admin)):
+    """Add a strike to a team member"""
+    # Verify member is in head admin's team
+    team = await db.staff_teams.find_one({"head_admin_id": user.discord_id})
+    if not team or discord_id not in team.get("members", []):
+        raise HTTPException(status_code=404, detail="Member not in your team")
+    
+    # Get staff member
+    staff = await db.users.find_one({"discord_id": discord_id})
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    new_strikes = staff.get("strikes", 0) + 1
+    
+    # Update strikes
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {"strikes": new_strikes}}
+    )
+    
+    # Add note about strike
+    note = {
+        "text": f"⚠️ Strike {new_strikes}/3: {strike_data.reason}",
+        "added_by": user.username,
+        "added_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$push": {"notes": note}}
+    )
+    
+    # If 3 strikes, notify for firing
+    if new_strikes >= 3:
+        await notify_firing_request(
+            staff["username"],
+            discord_id,
+            user.username,
+            f"3 strikes opnået. Sidste strike: {strike_data.reason}"
+        )
+    
+    return {"success": True, "strikes": new_strikes, "requires_firing": new_strikes >= 3}
+
+@api_router.post("/staff/my-team/members/{discord_id}/note")
+async def add_note(discord_id: str, note_data: AddNoteRequest, user: User = Depends(require_head_admin)):
+    """Add a note to a team member"""
+    # Verify member is in head admin's team
+    team = await db.staff_teams.find_one({"head_admin_id": user.discord_id})
+    if not team or discord_id not in team.get("members", []):
+        raise HTTPException(status_code=404, detail="Member not in your team")
+    
+    note = {
+        "text": note_data.note,
+        "added_by": user.username,
+        "added_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$push": {"notes": note}}
+    )
+    
+    return {"success": True}
+
+@api_router.post("/staff/my-team/members/{discord_id}/uprank")
+async def uprank_member(discord_id: str, uprank_data: UpRankRequest, user: User = Depends(require_head_admin)):
+    """Uprank a team member"""
+    # Verify member is in head admin's team
+    team = await db.staff_teams.find_one({"head_admin_id": user.discord_id})
+    if not team or discord_id not in team.get("members", []):
+        raise HTTPException(status_code=404, detail="Member not in your team")
+    
+    staff = await db.users.find_one({"discord_id": discord_id})
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    old_rank = staff.get("staff_rank", "mod_elev")
+    new_rank = uprank_data.new_rank
+    
+    # Update database
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {"staff_rank": new_rank}}
+    )
+    
+    # Add note about uprank
+    note = {
+        "text": f"🎉 Upranket fra {old_rank} til {new_rank}",
+        "added_by": user.username,
+        "added_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$push": {"notes": note}}
+    )
+    
+    # Update Discord roles
+    success = await update_discord_roles(discord_id, new_rank)
+    
+    return {"success": True, "discord_updated": success, "new_rank": new_rank}
+
 @api_router.post("/staff-teams", response_model=StaffTeam)
 async def create_staff_team(team_data: StaffTeamCreate, user: User = Depends(require_admin)):
     # Verify head admin exists and has correct role
