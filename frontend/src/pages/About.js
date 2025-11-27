@@ -25,7 +25,7 @@ const About = () => {
               Vi har fokus på seriøs roleplay, et aktivt community og et dedikeret staff team.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed">
-              Vores server har været online siden 2024 og har vokset til et af de største danske FiveM communities.
+              Vores server har været online siden 2025 og vokser hurtigt til at blive et af de største danske FiveM communities.
             </p>
           </div>
 
