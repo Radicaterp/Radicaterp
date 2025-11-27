@@ -104,6 +104,12 @@ function App() {
                 user && user.is_admin ? <SuperAdminPanel /> : <Navigate to="/" />
               }
             />
+            <Route
+              path="/fivem-panel"
+              element={
+                user && user.is_admin ? <FiveMPanel /> : <Navigate to="/" />
+              }
+            />
           </Routes>
         </BrowserRouter>
       </div>
