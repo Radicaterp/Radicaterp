@@ -202,6 +202,18 @@ const Navbar = () => {
                             <div className="text-xs text-gray-400">Opret & Administrér Teams</div>
                           </Link>
                         )}
+                        {user.is_admin && (
+                          <Link
+                            to="/fivem-panel"
+                            onClick={() => setAdminDropdownOpen(false)}
+                            className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                              isActive("/fivem-panel") ? "bg-[#4A90E2]/30" : ""
+                            }`}
+                          >
+                            <div className="font-medium">FiveM Panel</div>
+                            <div className="text-xs text-gray-400">Server Admin</div>
+                          </Link>
+                        )}
                       </div>
                     )}
                   </div>
