@@ -527,9 +527,9 @@ async def discord_callback(code: str, response: Response):
             samesite="lax"
         )
         
-        # Redirect to frontend
+        # Redirect to frontend (303 = faster, use GET)
         redirect_url = os.environ.get("CORS_ORIGINS", "https://www.redicate.dk")
-        return RedirectResponse(url=redirect_url, status_code=302)
+        return RedirectResponse(url=redirect_url, status_code=303)
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: User = Depends(require_auth)):
