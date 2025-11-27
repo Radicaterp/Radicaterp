@@ -273,16 +273,33 @@ const AdminPanel = () => {
                             {selectedApp.username} - {selectedApp.application_type_name}
                           </DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4 mt-4">
-                          {Object.entries(selectedApp.answers).map(([key, value]) => (
-                            <div key={key}>
-                              <h4 className="font-semibold text-[#4A90E2] mb-1 capitalize">
-                                {key.replace(/_/g, " ")}:
-                              </h4>
-                              <p className="text-gray-300 whitespace-pre-wrap">{value}</p>
-                            </div>
-                          ))}
-                          <div className="flex gap-3 pt-4">
+                        <div className="space-y-6 mt-4 pr-2">
+                          {(() => {
+                            // Find matching application type to get questions
+                            const appType = applicationTypes.find(at => at.id === selectedApp.application_type_id);
+                            const questions = appType?.questions || [];
+                            
+                            // Create ordered list based on questions order
+                            return questions.map((question, index) => {
+                              const answer = selectedApp.answers[question.id] || "Ikke besvaret";
+                              return (
+                                <div key={question.id} className="border-b border-[#4A90E2]/20 pb-4">
+                                  <div className="flex items-start gap-2 mb-2">
+                                    <span className="text-[#4A90E2] font-bold text-sm">{index + 1}.</span>
+                                    <h4 className="font-semibold text-[#4A90E2] flex-1">
+                                      {question.label}
+                                      {question.required && <span className="text-red-500 ml-1">*</span>}
+                                    </h4>
+                                  </div>
+                                  <p className="text-gray-300 whitespace-pre-wrap ml-6 bg-[#0a0a0b]/50 p-3 rounded-lg">
+                                    {answer}
+                                  </p>
+                                </div>
+                              );
+                            });
+                          })()}
+                          
+                          <div className="flex gap-3 pt-4 border-t border-[#4A90E2]/20 mt-6">
                             <Button
                               onClick={() => handleReviewApplication(selectedApp.id, "approved")}
                               className="flex-1 bg-green-600 hover:bg-green-700"
