@@ -161,6 +161,9 @@ class User(BaseModel):
     is_head_admin: bool = False
     role: Optional[str] = "player"  # player, staff, head_admin, super_admin
     team_id: Optional[str] = None  # Staff team ID
+    staff_rank: Optional[str] = "mod_elev"  # mod_elev, moderator, administrator, senior_admin
+    strikes: int = 0
+    notes: List[dict] = []  # [{text: str, added_by: str, added_at: str}]
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class StaffTeam(BaseModel):
