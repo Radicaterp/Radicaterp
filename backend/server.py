@@ -78,7 +78,7 @@ async def init_discord_bot():
         discord_bot_client = DiscordBot()
         asyncio.create_task(discord_bot_client.start(DISCORD_BOT_TOKEN))
 
-async def send_discord_embed(user_id: str, username: str, app_type: str, status: str, reviewed_by: str):
+async def send_discord_embed(user_id: str, username: str, app_type: str, status: str, reviewed_by: str, head_admin_id: str = None, team_name: str = None):
     """Send Discord embed notification"""
     if not discord_bot_client or not discord_bot_ready:
         print("Discord bot not ready")
@@ -105,10 +105,45 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
         embed.add_field(name="Ansøgningstype", value=app_type, inline=True)
         embed.add_field(name="Status", value=status_text, inline=True)
         embed.add_field(name="Behandlet af", value=reviewed_by, inline=False)
+        
+        # If approved staff application, add team info
+        if status == "approved" and app_type.lower() == "staff" and head_admin_id and team_name:
+            embed.add_field(
+                name="📋 Dit Team", 
+                value=f"**{team_name}**\nDin Head Admin: <@{head_admin_id}>", 
+                inline=False
+            )
+        
         embed.set_footer(text="Redicate RP", icon_url="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png")
         
         await channel.send(embed=embed)
         print(f"Sent Discord embed for {username}")
+        
+        # Also send DM to approved staff member
+        if status == "approved" and app_type.lower() == "staff" and head_admin_id and team_name:
+            try:
+                user = await discord_bot_client.fetch_user(int(user_id))
+                if user:
+                    dm_embed = discord.Embed(
+                        title="🎉 Velkommen til Staff Teamet!",
+                        description=f"Tillykke **{username}**! Du er nu en del af staff teamet.",
+                        color=discord.Color.blue(),
+                        timestamp=datetime.now(timezone.utc)
+                    )
+                    dm_embed.add_field(name="📋 Dit Team", value=team_name, inline=True)
+                    dm_embed.add_field(name="👤 Din Head Admin", value=f"<@{head_admin_id}>", inline=True)
+                    dm_embed.add_field(
+                        name="📝 Næste Skridt", 
+                        value="• Kontakt din Head Admin for onboarding\n• Få tildelt dine opgaver\n• Start din staff træning", 
+                        inline=False
+                    )
+                    dm_embed.set_footer(text="Redicate RP Staff System")
+                    
+                    await user.send(embed=dm_embed)
+                    print(f"Sent DM to {username} with team info")
+            except Exception as dm_error:
+                print(f"Could not send DM to {username}: {dm_error}")
+        
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
