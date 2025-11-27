@@ -391,6 +391,14 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin_u
                 )
             
             async def reject_callback(self, interaction: discord.Interaction):
+                # Check if user is authorized
+                if str(interaction.user.id) != DISCORD_FIRING_APPROVER_USER_ID:
+                    await interaction.response.send_message(
+                        "❌ Du har ikke rettigheder til at afvise fyringer!",
+                        ephemeral=True
+                    )
+                    return
+                
                 # Update firing request in database
                 await db.firing_requests.update_one(
                     {"id": self.request_id},
