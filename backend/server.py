@@ -121,7 +121,7 @@ async def send_staff_assignment_dm(head_admin_id: str, new_staff_username: str, 
         embed.add_field(name="Team", value=team_name, inline=True)
         
         # Guide for head admin
-        guide_text = \"\"\"
+        guide_text = """
 **📋 HVAD NU?**
 
 1️⃣ **Velkomst**: Tag kontakt til det nye staff medlem og byd dem velkommen
@@ -141,7 +141,7 @@ async def send_staff_assignment_dm(head_admin_id: str, new_staff_username: str, 
 Hvis du har brug for hjælp til at træne dit team, kontakt Super Admins.
 
 God fornøjelse med dit nye team medlem! 🚀
-\"\"\"
+"""
         
         embed.add_field(name="Guide til Træning", value=guide_text, inline=False)
         embed.set_footer(text="Redicate RP Staff System")
