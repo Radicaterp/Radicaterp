@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Response, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Response, Request, BackgroundTasks
 from fastapi.responses import RedirectResponse, JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -12,6 +12,8 @@ import uuid
 from datetime import datetime, timezone
 import httpx
 import secrets
+import discord
+import asyncio
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -21,18 +23,85 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Discord OAuth Config
-DISCORD_CLIENT_ID = os.environ.get('DISCORD_CLIENT_ID', '1443501738899406858')
-DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET', 'Cbb5n5vmgzU2QA_nCSztIyPyOIkvPiKz')
-DISCORD_REDIRECT_URI = os.environ.get('DISCORD_REDIRECT_URI', 'https://team-management-10.preview.emergentagent.com/auth/callback')
+# Discord Config
+DISCORD_CLIENT_ID = os.environ.get('DISCORD_CLIENT_ID')
+DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET')
+DISCORD_REDIRECT_URI = os.environ.get('DISCORD_REDIRECT_URI')
+DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
+DISCORD_ADMIN_ROLE_ID = os.environ.get('DISCORD_ADMIN_ROLE_ID')
+DISCORD_GUILD_ID = os.environ.get('DISCORD_GUILD_ID')
 DISCORD_API_ENDPOINT = 'https://discord.com/api/v10'
 
-# Session storage (in production, use Redis)
+# Session storage
 sessions = {}
 
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+# Discord Bot for sending embeds
+discord_bot_client = None
+discord_bot_ready = False
+
+class DiscordBot(discord.Client):
+    def __init__(self):
+        intents = discord.Intents.default()
+        super().__init__(intents=intents)
+    
+    async def on_ready(self):
+        global discord_bot_ready
+        discord_bot_ready = True
+        print(f'Discord bot logged in as {self.user}')
+
+async def init_discord_bot():
+    global discord_bot_client
+    if DISCORD_BOT_TOKEN and not discord_bot_client:
+        discord_bot_client = DiscordBot()
+        asyncio.create_task(discord_bot_client.start(DISCORD_BOT_TOKEN))
+
+async def send_discord_embed(user_id: str, username: str, app_type: str, status: str, reviewed_by: str):
+    """Send Discord embed notification"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready")
+        return
+    
+    try:
+        guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
+        if not guild:
+            print(f"Guild {DISCORD_GUILD_ID} not found")
+            return
+        
+        # Find a suitable channel (first text channel)
+        channel = None
+        for ch in guild.text_channels:
+            if ch.permissions_for(guild.me).send_messages:
+                channel = ch
+                break
+        
+        if not channel:
+            print("No suitable channel found")
+            return
+        
+        # Create embed
+        color = discord.Color.green() if status == "approved" else discord.Color.red()
+        status_text = "✅ GODKENDT" if status == "approved" else "❌ AFVIST"
+        
+        embed = discord.Embed(
+            title=f"{status_text} - {app_type} Ansøgning",
+            description=f"<@{user_id}> din ansøgning til **{app_type}** er blevet {status_text.lower()}!",
+            color=color,
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="Ansøger", value=username, inline=True)
+        embed.add_field(name="Ansøgningstype", value=app_type, inline=True)
+        embed.add_field(name="Status", value=status_text, inline=True)
+        embed.add_field(name="Behandlet af", value=reviewed_by, inline=False)
+        embed.set_footer(text="Redicate RP", icon_url="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png")
+        
+        await channel.send(embed=embed)
+        print(f"Sent Discord embed for {username}")
+    except Exception as e:
+        print(f"Failed to send Discord embed: {e}")
 
 # Models
 class User(BaseModel):
@@ -40,51 +109,47 @@ class User(BaseModel):
     discord_id: str
     username: str
     avatar: Optional[str] = None
-    role: Literal["player", "staff", "head_admin", "owner"] = "player"
+    is_admin: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-class Team(BaseModel):
+class ApplicationType(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
-    type: Literal["staff", "whitelist"] = "whitelist"
     icon: Optional[str] = None
     color: Optional[str] = "#4A90E2"
-    members: List[str] = []  # Discord IDs
+    questions: List[dict] = []  # [{"label": "Question", "type": "text", "required": true}]
+    active: bool = True
     created_by: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-class TeamCreate(BaseModel):
+class ApplicationTypeCreate(BaseModel):
     name: str
     description: str
-    type: Literal["staff", "whitelist"] = "whitelist"
     icon: Optional[str] = None
     color: Optional[str] = "#4A90E2"
+    questions: List[dict] = []
 
 class Application(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str  # Discord ID
+    user_id: str
     username: str
-    team_id: str
-    team_name: str
-    type: Literal["staff", "whitelist"]
+    application_type_id: str
+    application_type_name: str
     status: Literal["pending", "approved", "rejected"] = "pending"
-    answers: dict  # Form answers
+    answers: dict
     submitted_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     reviewed_by: Optional[str] = None
     reviewed_at: Optional[str] = None
 
 class ApplicationCreate(BaseModel):
-    team_id: str
+    application_type_id: str
     answers: dict
 
 class ApplicationReview(BaseModel):
     status: Literal["approved", "rejected"]
-
-class UserRoleUpdate(BaseModel):
-    role: Literal["player", "staff", "head_admin", "owner"]
 
 # Auth helpers
 async def get_current_user(request: Request) -> Optional[User]:
@@ -107,15 +172,46 @@ async def require_auth(request: Request) -> User:
 
 async def require_admin(request: Request) -> User:
     user = await require_auth(request)
-    if user.role not in ["head_admin", "owner"]:
+    if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
-async def require_owner(request: Request) -> User:
-    user = await require_auth(request)
-    if user.role != "owner":
-        raise HTTPException(status_code=403, detail="Owner access required")
-    return user
+async def check_discord_role(access_token: str) -> bool:
+    """Check if user has admin role in Discord server"""
+    try:
+        async with httpx.AsyncClient() as http_client:
+            # Get user's guilds
+            guilds_response = await http_client.get(
+                f"{DISCORD_API_ENDPOINT}/users/@me/guilds",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            
+            if guilds_response.status_code != 200:
+                return False
+            
+            guilds = guilds_response.json()
+            
+            # Check if user is in the required guild
+            in_guild = any(g["id"] == DISCORD_GUILD_ID for g in guilds)
+            if not in_guild:
+                return False
+            
+            # Get guild member info
+            member_response = await http_client.get(
+                f"{DISCORD_API_ENDPOINT}/users/@me/guilds/{DISCORD_GUILD_ID}/member",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            
+            if member_response.status_code != 200:
+                return False
+            
+            member_data = member_response.json()
+            roles = member_data.get("roles", [])
+            
+            return DISCORD_ADMIN_ROLE_ID in roles
+    except Exception as e:
+        print(f"Error checking Discord role: {e}")
+        return False
 
 # Discord OAuth endpoints
 @api_router.get("/auth/login")
@@ -125,7 +221,7 @@ async def discord_login():
         f"client_id={DISCORD_CLIENT_ID}&"
         f"redirect_uri={DISCORD_REDIRECT_URI}&"
         f"response_type=code&"
-        f"scope=identify"
+        f"scope=identify guilds guilds.members.read"
     )
     return {"url": oauth_url}
 
@@ -165,23 +261,24 @@ async def discord_callback(code: str, response: Response):
         username = discord_user["username"]
         avatar = discord_user.get("avatar")
         
+        # Check if user has admin role
+        is_admin = await check_discord_role(access_token)
+        
         # Check if user exists
         existing_user = await db.users.find_one({"discord_id": discord_id})
         
         if not existing_user:
-            # Create new user
             user_obj = User(
                 discord_id=discord_id,
                 username=username,
                 avatar=avatar,
-                role="player"
+                is_admin=is_admin
             )
             await db.users.insert_one(user_obj.model_dump())
         else:
-            # Update username/avatar
             await db.users.update_one(
                 {"discord_id": discord_id},
-                {"$set": {"username": username, "avatar": avatar}}
+                {"$set": {"username": username, "avatar": avatar, "is_admin": is_admin}}
             )
         
         # Create session
@@ -192,7 +289,7 @@ async def discord_callback(code: str, response: Response):
             key="session_token",
             value=session_token,
             httponly=True,
-            max_age=7 * 24 * 60 * 60,  # 7 days
+            max_age=7 * 24 * 60 * 60,
             samesite="lax"
         )
         
@@ -210,69 +307,44 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("session_token")
     return {"success": True}
 
-# Team endpoints
-@api_router.get("/teams", response_model=List[Team])
-async def get_teams():
-    teams = await db.teams.find({}, {"_id": 0}).to_list(1000)
-    return teams
+# Application Types endpoints
+@api_router.get("/application-types", response_model=List[ApplicationType])
+async def get_application_types():
+    app_types = await db.application_types.find({"active": True}, {"_id": 0}).to_list(1000)
+    return app_types
 
-@api_router.post("/teams", response_model=Team)
-async def create_team(team_data: TeamCreate, user: User = Depends(require_admin)):
-    team = Team(**team_data.model_dump(), created_by=user.discord_id)
-    await db.teams.insert_one(team.model_dump())
-    return team
+@api_router.post("/application-types", response_model=ApplicationType)
+async def create_application_type(app_type_data: ApplicationTypeCreate, user: User = Depends(require_admin)):
+    app_type = ApplicationType(**app_type_data.model_dump(), created_by=user.discord_id)
+    await db.application_types.insert_one(app_type.model_dump())
+    return app_type
 
-@api_router.get("/teams/{team_id}", response_model=Team)
-async def get_team(team_id: str):
-    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
-    if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return Team(**team)
-
-@api_router.put("/teams/{team_id}", response_model=Team)
-async def update_team(team_id: str, team_data: TeamCreate, user: User = Depends(require_admin)):
-    result = await db.teams.update_one(
-        {"id": team_id},
-        {"$set": team_data.model_dump()}
+@api_router.put("/application-types/{type_id}", response_model=ApplicationType)
+async def update_application_type(type_id: str, app_type_data: ApplicationTypeCreate, user: User = Depends(require_admin)):
+    result = await db.application_types.update_one(
+        {"id": type_id},
+        {"$set": app_type_data.model_dump()}
     )
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Team not found")
+        raise HTTPException(status_code=404, detail="Application type not found")
     
-    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
-    return Team(**team)
+    app_type = await db.application_types.find_one({"id": type_id}, {"_id": 0})
+    return ApplicationType(**app_type)
 
-@api_router.delete("/teams/{team_id}")
-async def delete_team(team_id: str, user: User = Depends(require_admin)):
-    result = await db.teams.delete_one({"id": team_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return {"success": True}
-
-@api_router.post("/teams/{team_id}/members/{discord_id}")
-async def add_team_member(team_id: str, discord_id: str, user: User = Depends(require_admin)):
-    result = await db.teams.update_one(
-        {"id": team_id},
-        {"$addToSet": {"members": discord_id}}
+@api_router.delete("/application-types/{type_id}")
+async def delete_application_type(type_id: str, user: User = Depends(require_admin)):
+    result = await db.application_types.update_one(
+        {"id": type_id},
+        {"$set": {"active": False}}
     )
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Team not found")
+        raise HTTPException(status_code=404, detail="Application type not found")
     return {"success": True}
 
-@api_router.delete("/teams/{team_id}/members/{discord_id}")
-async def remove_team_member(team_id: str, discord_id: str, user: User = Depends(require_admin)):
-    result = await db.teams.update_one(
-        {"id": team_id},
-        {"$pull": {"members": discord_id}}
-    )
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return {"success": True}
-
-# Application endpoints
+# Applications endpoints
 @api_router.get("/applications", response_model=List[Application])
 async def get_applications(user: User = Depends(require_auth)):
-    # Admin sees all, users see only their own
-    if user.role in ["head_admin", "owner"]:
+    if user.is_admin:
         applications = await db.applications.find({}, {"_id": 0}).to_list(1000)
     else:
         applications = await db.applications.find({"user_id": user.discord_id}, {"_id": 0}).to_list(1000)
@@ -281,26 +353,25 @@ async def get_applications(user: User = Depends(require_auth)):
 
 @api_router.post("/applications", response_model=Application)
 async def create_application(app_data: ApplicationCreate, user: User = Depends(require_auth)):
-    # Get team info
-    team = await db.teams.find_one({"id": app_data.team_id}, {"_id": 0})
-    if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
+    # Get application type info
+    app_type = await db.application_types.find_one({"id": app_data.application_type_id}, {"_id": 0})
+    if not app_type or not app_type.get("active", True):
+        raise HTTPException(status_code=404, detail="Application type not found")
     
-    # Check if user already has pending application for this team
+    # Check if user already has pending application for this type
     existing = await db.applications.find_one({
         "user_id": user.discord_id,
-        "team_id": app_data.team_id,
+        "application_type_id": app_data.application_type_id,
         "status": "pending"
     })
     if existing:
-        raise HTTPException(status_code=400, detail="You already have a pending application for this team")
+        raise HTTPException(status_code=400, detail="Du har allerede en afventende ansøgning for denne type")
     
     application = Application(
         user_id=user.discord_id,
         username=user.username,
-        team_id=app_data.team_id,
-        team_name=team["name"],
-        type=team["type"],
+        application_type_id=app_data.application_type_id,
+        application_type_name=app_type["name"],
         answers=app_data.answers
     )
     
@@ -313,14 +384,18 @@ async def get_application(app_id: str, user: User = Depends(require_auth)):
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
     
-    # Users can only see their own applications
-    if user.role not in ["head_admin", "owner"] and application["user_id"] != user.discord_id:
+    if not user.is_admin and application["user_id"] != user.discord_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     return Application(**application)
 
 @api_router.post("/applications/{app_id}/review")
-async def review_application(app_id: str, review: ApplicationReview, user: User = Depends(require_admin)):
+async def review_application(
+    app_id: str, 
+    review: ApplicationReview, 
+    background_tasks: BackgroundTasks,
+    user: User = Depends(require_admin)
+):
     application = await db.applications.find_one({"id": app_id}, {"_id": 0})
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -330,57 +405,36 @@ async def review_application(app_id: str, review: ApplicationReview, user: User 
         {"id": app_id},
         {"$set": {
             "status": review.status,
-            "reviewed_by": user.discord_id,
+            "reviewed_by": user.username,
             "reviewed_at": datetime.now(timezone.utc).isoformat()
         }}
     )
     
-    # If approved, add to team and update user role
-    if review.status == "approved":
-        # Add to team
-        await db.teams.update_one(
-            {"id": application["team_id"]},
-            {"$addToSet": {"members": application["user_id"]}}
-        )
-        
-        # If it's a staff application, update user role
-        if application["type"] == "staff":
-            await db.users.update_one(
-                {"discord_id": application["user_id"]},
-                {"$set": {"role": "staff"}}
-            )
-    
-    return {"success": True}
-
-# User management endpoints
-@api_router.get("/users", response_model=List[User])
-async def get_users(user: User = Depends(require_admin)):
-    users = await db.users.find({}, {"_id": 0}).to_list(1000)
-    return users
-
-@api_router.put("/users/{discord_id}/role")
-async def update_user_role(discord_id: str, role_data: UserRoleUpdate, user: User = Depends(require_owner)):
-    result = await db.users.update_one(
-        {"discord_id": discord_id},
-        {"$set": {"role": role_data.role}}
+    # Send Discord embed in background
+    background_tasks.add_task(
+        send_discord_embed,
+        application["user_id"],
+        application["username"],
+        application["application_type_name"],
+        review.status,
+        user.username
     )
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
+    
     return {"success": True}
 
 # Stats endpoint
 @api_router.get("/stats")
 async def get_stats(user: User = Depends(require_admin)):
     total_users = await db.users.count_documents({})
-    total_teams = await db.teams.count_documents({})
+    total_app_types = await db.application_types.count_documents({"active": True})
     pending_apps = await db.applications.count_documents({"status": "pending"})
-    staff_count = await db.users.count_documents({"role": {"$in": ["staff", "head_admin", "owner"]}})
+    approved_apps = await db.applications.count_documents({"status": "approved"})
     
     return {
         "total_users": total_users,
-        "total_teams": total_teams,
+        "total_application_types": total_app_types,
         "pending_applications": pending_apps,
-        "staff_count": staff_count
+        "approved_applications": approved_apps
     }
 
 # Include router
@@ -400,6 +454,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    await init_discord_bot()
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+    if discord_bot_client:
+        await discord_bot_client.close()
