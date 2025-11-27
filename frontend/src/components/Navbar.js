@@ -16,70 +16,69 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b-2 border-[#00d9ff]" data-testid="navbar" style={{ backgroundColor: 'rgba(13, 13, 15, 0.95)' }}>
-      <div className="max-w-7xl mx-auto px-6 py-3">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#4A90E2]/20" data-testid="navbar">
+      <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-all" data-testid="nav-logo">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" data-testid="nav-logo">
             <img 
               src="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png" 
               alt="Redicate Logo" 
-              className="h-9 w-9 object-contain"
-              style={{ filter: 'drop-shadow(0 0 10px rgba(0, 217, 255, 0.5))' }}
+              className="h-10 w-10 object-contain"
             />
-            <h1 className="text-xl font-black gradient-text tracking-widest">REDICATE</h1>
+            <h1 className="text-xl font-bold gradient-text">REDICATE</h1>
           </Link>
 
           {/* Navigation Links */}
           <div className="flex items-center gap-6">
             <Link 
               to="/" 
-              className={`text-sm font-bold tracking-wider transition-all ${
-                isActive("/") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                isActive("/") ? "text-[#4A90E2]" : ""
               }`}
               data-testid="nav-home"
             >
-              [ HOME ]
+              Hjem
             </Link>
             
             {user && (
               <>
                 <Link 
                   to="/applications" 
-                  className={`text-sm font-bold tracking-wider transition-all ${
-                    isActive("/applications") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                    isActive("/applications") ? "text-[#4A90E2]" : ""
                   }`}
                   data-testid="nav-applications"
                 >
-                  [ ANSØG ]
+                  Ansøg
                 </Link>
                 <Link 
                   to="/my-applications" 
-                  className={`text-sm font-bold tracking-wider transition-all ${
-                    isActive("/my-applications") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                    isActive("/my-applications") ? "text-[#4A90E2]" : ""
                   }`}
                   data-testid="nav-my-applications"
                 >
-                  [ STATUS ]
+                  Mine Ansøgninger
                 </Link>
                 <Link 
                   to="/report" 
-                  className={`text-sm font-bold tracking-wider transition-all ${
-                    isActive("/report") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                    isActive("/report") ? "text-[#4A90E2]" : ""
                   }`}
                   data-testid="nav-report"
                 >
-                  [ REPORT ]
+                  Rapportér
                 </Link>
                 {user.is_admin && (
                   <Link 
                     to="/admin" 
-                    className={`text-sm font-bold tracking-wider transition-all ${
-                      isActive("/admin") ? "text-[#7b2ff7]" : "text-gray-400 hover:text-[#7b2ff7]"
+                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                      isActive("/admin") ? "text-[#4A90E2]" : ""
                     }`}
                     data-testid="nav-admin"
                   >
-                    [ ADMIN ]
+                    Admin
                   </Link>
                 )}
               </>
@@ -87,38 +86,40 @@ const Navbar = () => {
             
             <Link 
               to="/staff" 
-              className={`text-sm font-bold tracking-wider transition-all ${
-                isActive("/staff") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                isActive("/staff") ? "text-[#4A90E2]" : ""
               }`}
               data-testid="nav-staff"
             >
-              [ STAFF ]
+              Staff
             </Link>
             
             <Link 
               to="/about" 
-              className={`text-sm font-bold tracking-wider transition-all ${
-                isActive("/about") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
+              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                isActive("/about") ? "text-[#4A90E2]" : ""
               }`}
               data-testid="nav-about"
             >
-              [ INFO ]
+              Om Os
             </Link>
 
             {/* User Info & Logout */}
             {user ? (
-              <div className="flex items-center gap-3 ml-4 pl-4 border-l-2 border-[#00d9ff]">
+              <div className="flex items-center gap-4 ml-4 pl-4 border-l border-[#4A90E2]/30">
                 <div className="text-right" data-testid="nav-user-info">
-                  <div className="text-white font-bold text-xs tracking-wider">&gt; {user.username}</div>
-                  {user.is_admin && <div className="text-[#7b2ff7] text-xs font-mono">ADMIN</div>}
+                  <div className="text-white font-semibold text-sm">{user.username}</div>
+                  {user.is_admin && <div className="text-[#4A90E2] text-xs">Admin</div>}
                 </div>
-                <button
+                <Button 
                   onClick={handleLogout}
-                  className="text-xs font-bold text-red-500 hover:text-red-400 tracking-wider"
+                  variant="outline"
+                  size="sm"
+                  className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10"
                   data-testid="logout-button"
                 >
-                  [ EXIT ]
-                </button>
+                  Log ud
+                </Button>
               </div>
             ) : null}
           </div>
