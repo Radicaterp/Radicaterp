@@ -1376,9 +1376,67 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+async def check_probation_periods():
+    """Background task to check and upgrade staff from probation"""
+    while True:
+        try:
+            await asyncio.sleep(3600)  # Check every hour
+            
+            # Find users whose probation has ended
+            now = datetime.now(timezone.utc).isoformat()
+            expired_probations = await db.users.find({
+                "on_probation": True,
+                "probation_end_date": {"$lte": now}
+            }).to_list(None)
+            
+            for user in expired_probations:
+                print(f"🔄 Processing probation upgrade for {user['username']}")
+                
+                # Upgrade Discord roles
+                success = await upgrade_from_probation(user['discord_id'])
+                
+                if success:
+                    # Update database
+                    await db.users.update_one(
+                        {"discord_id": user["discord_id"]},
+                        {"$set": {
+                            "on_probation": False,
+                            "probation_end_date": None
+                        }}
+                    )
+                    print(f"✅ Successfully upgraded {user['username']} from probation")
+                    
+                    # Send DM to user
+                    try:
+                        if discord_bot_client and discord_bot_ready:
+                            discord_user = await discord_bot_client.fetch_user(int(user['discord_id']))
+                            if discord_user:
+                                embed = discord.Embed(
+                                    title="🎉 Probation Afsluttet!",
+                                    description=f"Tillykke **{user['username']}**! Du har gennemført din probation periode.",
+                                    color=discord.Color.green(),
+                                    timestamp=datetime.now(timezone.utc)
+                                )
+                                embed.add_field(
+                                    name="✅ Hvad betyder det?",
+                                    value="• Du er nu fuldt staff medlem\n• Du har fået din permanente staff rolle\n• Fortsæt det gode arbejde!",
+                                    inline=False
+                                )
+                                embed.set_footer(text="Redicate RP Staff System")
+                                await discord_user.send(embed=embed)
+                    except Exception as dm_error:
+                        print(f"Could not send probation completion DM: {dm_error}")
+                
+        except Exception as e:
+            print(f"Error in probation check: {e}")
+            import traceback
+            traceback.print_exc()
+
 @app.on_event("startup")
 async def startup_event():
     await init_discord_bot()
+    # Start probation checker
+    asyncio.create_task(check_probation_periods())
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
