@@ -317,8 +317,8 @@ const SuperAdminPanel = () => {
                 Tilføj Staff
               </Button>
             </form>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
     </div>
   );
