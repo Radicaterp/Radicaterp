@@ -287,8 +287,9 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin_u
         )
         await db.firing_requests.insert_one(firing_request.model_dump())
         
-        channel = discord_bot_client.get_channel(int(DISCORD_CHANNEL_ID))
+        channel = discord_bot_client.get_channel(int(DISCORD_FIRING_CHANNEL_ID))
         if not channel:
+            print(f"Firing channel {DISCORD_FIRING_CHANNEL_ID} not found")
             return
         
         # Build strikes list
@@ -299,7 +300,7 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin_u
         
         embed = discord.Embed(
             title="⚠️ Fyring Anmodning",
-            description=f"<@&{DISCORD_FIRING_APPROVER_ROLE_ID}> En staff medlem skal godkendes til fyring",
+            description=f"<@{DISCORD_FIRING_APPROVER_USER_ID}> En staff medlem skal godkendes til fyring",
             color=discord.Color.red(),
             timestamp=datetime.now(timezone.utc)
         )
