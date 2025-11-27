@@ -215,8 +215,8 @@ async def require_admin(request: Request) -> User:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
-async def check_discord_role(access_token: str) -> bool:
-    """Check if user has admin role in Discord server"""
+async def check_discord_role(access_token: str) -> tuple[bool, str]:
+    """Check user's Discord role and return (is_admin, role_type)"""
     try:
         async with httpx.AsyncClient() as http_client:
             # Get user's guilds
@@ -226,14 +226,14 @@ async def check_discord_role(access_token: str) -> bool:
             )
             
             if guilds_response.status_code != 200:
-                return False
+                return False, "player"
             
             guilds = guilds_response.json()
             
             # Check if user is in the required guild
             in_guild = any(g["id"] == DISCORD_GUILD_ID for g in guilds)
             if not in_guild:
-                return False
+                return False, "player"
             
             # Get guild member info
             member_response = await http_client.get(
@@ -242,15 +242,23 @@ async def check_discord_role(access_token: str) -> bool:
             )
             
             if member_response.status_code != 200:
-                return False
+                return False, "player"
             
             member_data = member_response.json()
             roles = member_data.get("roles", [])
             
-            return DISCORD_ADMIN_ROLE_ID in roles
+            # Check role hierarchy
+            if DISCORD_SUPER_ADMIN_ROLE_ID in roles:
+                return True, "super_admin"
+            elif DISCORD_HEAD_ADMIN_ROLE_ID in roles:
+                return True, "head_admin"
+            elif DISCORD_ADMIN_ROLE_ID in roles:
+                return True, "staff"
+            
+            return False, "player"
     except Exception as e:
         print(f"Error checking Discord role: {e}")
-        return False
+        return False, "player"
 
 # Discord OAuth endpoints
 @api_router.get("/auth/login")
