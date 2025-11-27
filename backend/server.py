@@ -1001,6 +1001,13 @@ async def get_stats(user: User = Depends(require_admin)):
         "pending_reports": pending_reports
     }
 
+# Users endpoint for admin
+@api_router.get("/users", response_model=List[User])
+async def get_all_users(user: User = Depends(require_admin)):
+    """Get all users - for admin panel"""
+    users = await db.users.find({}, {"_id": 0}).to_list(10000)
+    return users
+
 # Include router
 app.include_router(api_router)
 
