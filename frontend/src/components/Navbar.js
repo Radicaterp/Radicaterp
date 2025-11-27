@@ -76,38 +76,63 @@ const Navbar = () => {
                 >
                   Rapportér
                 </Link>
-                {user.is_admin && (
-                  <Link 
-                    to="/admin" 
-                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                      isActive("/admin") ? "text-[#4A90E2]" : ""
-                    }`}
-                    data-testid="nav-admin"
-                  >
-                    Admin
-                  </Link>
-                )}
-                {user.is_head_admin && (
-                  <Link 
-                    to="/head-admin" 
-                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                      isActive("/head-admin") ? "text-[#4A90E2]" : ""
-                    }`}
-                    data-testid="nav-head-admin"
-                  >
-                    Head Admin
-                  </Link>
-                )}
-                {user.is_admin && (
-                  <Link 
-                    to="/super-admin" 
-                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                      isActive("/super-admin") ? "text-[#4A90E2]" : ""
-                    }`}
-                    data-testid="nav-super-admin"
-                  >
-                    Team Management
-                  </Link>
+                
+                {/* Admin Dropdown */}
+                {(user.is_admin || user.is_head_admin) && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
+                      onBlur={() => setTimeout(() => setAdminDropdownOpen(false), 200)}
+                      className={`flex items-center gap-1 font-medium transition-colors ${
+                        isAdminRouteActive() ? "text-[#4A90E2]" : "text-gray-300 hover:text-[#4A90E2]"
+                      }`}
+                      data-testid="nav-admin-dropdown"
+                    >
+                      Admin
+                      <ChevronDown className={`w-4 h-4 transition-transform ${adminDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {adminDropdownOpen && (
+                      <div className="absolute top-full right-0 mt-2 w-48 glass-card rounded-lg border border-[#4A90E2]/30 shadow-xl overflow-hidden">
+                        {user.is_admin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setAdminDropdownOpen(false)}
+                            className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                              isActive("/admin") ? "bg-[#4A90E2]/30" : ""
+                            }`}
+                          >
+                            <div className="font-medium">Admin Panel</div>
+                            <div className="text-xs text-gray-400">Ansøgninger & Rapporter</div>
+                          </Link>
+                        )}
+                        {user.is_head_admin && (
+                          <Link
+                            to="/head-admin"
+                            onClick={() => setAdminDropdownOpen(false)}
+                            className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                              isActive("/head-admin") ? "bg-[#4A90E2]/30" : ""
+                            }`}
+                          >
+                            <div className="font-medium">Head Admin</div>
+                            <div className="text-xs text-gray-400">Mit Team Management</div>
+                          </Link>
+                        )}
+                        {user.is_admin && (
+                          <Link
+                            to="/super-admin"
+                            onClick={() => setAdminDropdownOpen(false)}
+                            className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                              isActive("/super-admin") ? "bg-[#4A90E2]/30" : ""
+                            }`}
+                          >
+                            <div className="font-medium">Team Management</div>
+                            <div className="text-xs text-gray-400">Opret & Administrér Teams</div>
+                          </Link>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
               </>
             )}
