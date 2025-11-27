@@ -67,20 +67,10 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
         return
     
     try:
-        guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
-        if not guild:
-            print(f"Guild {DISCORD_GUILD_ID} not found")
-            return
-        
-        # Find a suitable channel (first text channel)
-        channel = None
-        for ch in guild.text_channels:
-            if ch.permissions_for(guild.me).send_messages:
-                channel = ch
-                break
-        
+        # Get the specific channel
+        channel = discord_bot_client.get_channel(int(DISCORD_CHANNEL_ID))
         if not channel:
-            print("No suitable channel found")
+            print(f"Channel {DISCORD_CHANNEL_ID} not found")
             return
         
         # Create embed
