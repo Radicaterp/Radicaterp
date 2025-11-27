@@ -214,9 +214,11 @@ const SuperAdminPanel = () => {
                 <p className="text-gray-400">Ingen staff teams oprettet endnu</p>
               </div>
             )}
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="create">
+        {activeTab === "create" && (
+          <div className="animate-fade-in">
             <form onSubmit={handleCreateTeam} className="glass-card p-8 rounded-2xl space-y-6">
               <h2 className="text-2xl font-bold text-[#4A90E2]">Opret Nyt Staff Team</h2>
               
