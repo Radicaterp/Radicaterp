@@ -7,13 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { ChevronDown } from "lucide-react";
 
 const SuperAdminPanel = () => {
   const [staffTeams, setStaffTeams] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [headAdmins, setHeadAdmins] = useState([]);
+  const [activeTab, setActiveTab] = useState("teams");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [newTeam, setNewTeam] = useState({
     name: "",
     description: "",
