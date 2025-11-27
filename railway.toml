@@ -1,0 +1,8 @@
+# Railway Multi-Service Configuration
+# This file defines how Railway should build and deploy each service
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "echo 'Please deploy backend and frontend as separate services'"
