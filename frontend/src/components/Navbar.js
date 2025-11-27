@@ -121,6 +121,7 @@ const Navbar = () => {
                 <div className="text-right" data-testid="nav-user-info">
                   <div className="text-white font-semibold text-sm">{user.username}</div>
                   {user.is_admin && <div className="text-[#4A90E2] text-xs">Admin</div>}
+                  {user.is_head_admin && <div className="text-[#4A90E2] text-xs">Head Admin</div>}
                 </div>
                 <Button 
                   onClick={handleLogout}
