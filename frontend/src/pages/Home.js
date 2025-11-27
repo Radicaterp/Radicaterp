@@ -19,12 +19,15 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] relative overflow-hidden">
-      {/* Animated Background */}
+    <div className="min-h-screen bg-[#0d0d0f] relative overflow-hidden scanline">
+      {/* Cyber Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-10"></div>
-        <div className="absolute top-20 left-10 w-96 h-96 bg-[#4A90E2] rounded-full opacity-20 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#5fa3f5] rounded-full opacity-20 blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-grid"></div>
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent opacity-30"></div>
+        <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#7b2ff7] to-transparent opacity-20"></div>
+        <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent opacity-30"></div>
+        <div className="absolute top-20 left-1/4 w-64 h-64 bg-[#00d9ff] rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#7b2ff7] rounded-full opacity-5 blur-3xl"></div>
       </div>
 
       <Navbar />
@@ -32,17 +35,20 @@ const Home = () => {
       {/* Hero Section */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-6">
         <div className="text-center max-w-5xl animate-fade-in">
-          <div className="mb-8 flex justify-center">
+          <div className="mb-6 flex justify-center relative">
+            <div className="absolute inset-0 bg-[#00d9ff] opacity-20 blur-2xl rounded-full"></div>
             <img 
               src="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png" 
               alt="Redicate Logo" 
-              className="h-48 w-48 object-contain glow-pulse"
+              className="h-40 w-40 object-contain relative z-10"
+              style={{ filter: 'drop-shadow(0 0 30px rgba(0, 217, 255, 0.6))' }}
             />
           </div>
           
-          <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 gradient-text tracking-tight">
+          <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black mb-4 gradient-text glow-text" style={{ letterSpacing: '8px' }}>
             REDICATE
           </h1>
+          <div className="h-1 w-64 mx-auto mb-6 bg-gradient-to-r from-transparent via-[#00d9ff] to-transparent"></div>
           
           <p className="text-2xl sm:text-3xl text-gray-300 mb-4 font-semibold">
             FiveM Roleplay Server
