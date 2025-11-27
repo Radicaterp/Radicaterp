@@ -430,13 +430,15 @@ async def check_discord_role(access_token: str) -> tuple[bool, str]:
             member_data = member_response.json()
             roles = member_data.get("roles", [])
             
-            # Check role hierarchy
+            # Check role hierarchy (top to bottom)
             if DISCORD_SUPER_ADMIN_ROLE_ID in roles:
                 return True, "super_admin"
             elif DISCORD_HEAD_ADMIN_ROLE_ID in roles:
                 return True, "head_admin"
             elif DISCORD_ADMIN_ROLE_ID in roles:
                 return True, "staff"
+            elif DISCORD_STAFF_MEMBER_ROLE_ID in roles:
+                return False, "staff_member"  # Approved staff in team, but no admin access
             
             return False, "player"
     except Exception as e:
