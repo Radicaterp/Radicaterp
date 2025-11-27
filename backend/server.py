@@ -374,6 +374,38 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin_u
                     }}
                 )
                 
+                # Send DM to fired staff member
+                try:
+                    fired_user = await discord_bot_client.fetch_user(int(firing_req["staff_id"]))
+                    if fired_user:
+                        dm_embed = discord.Embed(
+                            title="⚠️ Staff Fyring",
+                            description=f"Hej **{firing_req['staff_username']}**,\n\nDu er blevet fyret fra staff teamet.",
+                            color=discord.Color.red(),
+                            timestamp=datetime.now(timezone.utc)
+                        )
+                        dm_embed.add_field(
+                            name="📋 Årsag",
+                            value=firing_req["reason"],
+                            inline=False
+                        )
+                        dm_embed.add_field(
+                            name="⚠️ Strikes",
+                            value="\n".join([f"**Strike {i+1}:** {s['reason']}" for i, s in enumerate(firing_req["strikes"])]),
+                            inline=False
+                        )
+                        dm_embed.add_field(
+                            name="ℹ️ Hvad Nu?",
+                            value="Dine staff roller er blevet fjernet. Hvis du har spørgsmål, kontakt server ledelsen.",
+                            inline=False
+                        )
+                        dm_embed.set_footer(text="Redicate RP Staff System")
+                        
+                        await fired_user.send(embed=dm_embed)
+                        print(f"Sent firing DM to {firing_req['staff_username']}")
+                except Exception as dm_error:
+                    print(f"Could not send firing DM: {dm_error}")
+                
                 # Update embed
                 embed = interaction.message.embeds[0]
                 embed.color = discord.Color.green()
@@ -386,7 +418,7 @@ async def notify_firing_request(staff_username: str, staff_id: str, head_admin_u
                 
                 await interaction.response.edit_message(embed=embed, view=None)
                 await interaction.followup.send(
-                    f"✅ {firing_req['staff_username']} er blevet fyret og fjernet fra teamet.",
+                    f"✅ {firing_req['staff_username']} er blevet fyret og fjernet fra teamet. DM sendt.",
                     ephemeral=True
                 )
             
