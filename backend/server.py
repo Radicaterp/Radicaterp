@@ -308,8 +308,8 @@ async def discord_callback(code: str, response: Response):
         username = discord_user["username"]
         avatar = discord_user.get("avatar")
         
-        # Check if user has admin role
-        is_admin = await check_discord_role(access_token)
+        # Check user's Discord role
+        is_admin, role_type = await check_discord_role(access_token)
         
         # Check if user exists
         existing_user = await db.users.find_one({"discord_id": discord_id})
@@ -319,13 +319,14 @@ async def discord_callback(code: str, response: Response):
                 discord_id=discord_id,
                 username=username,
                 avatar=avatar,
-                is_admin=is_admin
+                is_admin=is_admin,
+                role=role_type
             )
             await db.users.insert_one(user_obj.model_dump())
         else:
             await db.users.update_one(
                 {"discord_id": discord_id},
-                {"$set": {"username": username, "avatar": avatar, "is_admin": is_admin}}
+                {"$set": {"username": username, "avatar": avatar, "is_admin": is_admin, "role": role_type}}
             )
         
         # Create session
