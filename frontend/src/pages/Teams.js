@@ -20,6 +20,8 @@ const Teams = () => {
       setTeams(response.data);
     } catch (error) {
       console.error("Failed to fetch teams", error);
+    } finally {
+      setLoading(false);
     }
   };
 
