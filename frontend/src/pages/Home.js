@@ -178,31 +178,34 @@ const Home = () => {
 
       {/* CTA Section */}
       <div className="relative z-10 py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center glass-card p-12 rounded-3xl">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 gradient-text">
-            Klar til at starte?
+        <div className="max-w-4xl mx-auto text-center glass-card corner-cut p-12">
+          <div className="mb-6">
+            <div className="inline-block border-2 border-[#00d9ff] px-4 py-2 corner-cut mb-4">
+              <span className="text-[#00d9ff] font-mono text-sm tracking-widest">SYSTEM_READY</span>
+            </div>
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-black mb-4 gradient-text tracking-wider">
+            READY TO JOIN?
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Join hundredvis af andre spillere i Redicate i dag
+          <p className="text-lg text-gray-400 mb-8 font-mono">
+            &gt; Connect til serveren og start din RP career
           </p>
           {!user ? (
-            <Button 
+            <button
               onClick={handleLogin}
-              size="lg"
-              className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-12 py-7 rounded-xl font-bold glow-hover"
+              className="cyber-btn cyber-btn-primary text-xl px-16 py-5"
               data-testid="cta-login-button"
             >
-              Log Ind Med Discord
-            </Button>
+              [ CONNECT VIA DISCORD ]
+            </button>
           ) : (
-            <Button 
+            <button
               onClick={() => navigate("/applications")}
-              size="lg"
-              className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-12 py-7 rounded-xl font-bold glow-hover"
+              className="cyber-btn cyber-btn-primary text-xl px-16 py-5"
               data-testid="cta-applications-button"
             >
-              Ansøg Nu
-            </Button>
+              [ START ANSØGNING ]
+            </button>
           )}
         </div>
       </div>
