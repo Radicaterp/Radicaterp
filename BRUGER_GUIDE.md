@@ -5,7 +5,7 @@
 Din FiveM server hjemmeside er nu live med fuld Discord integration!
 
 ### 🔗 URL
-**Hjemmeside:** https://redicate-hub.preview.emergentagent.com
+**Hjemmeside:** https://server-dashboard-11.preview.emergentagent.com
 
 ---
 
@@ -191,7 +191,7 @@ Systemet har et moderne gaming design med:
 
 **Discord Integration:**
 - Client ID: 1443501738899406858
-- Redirect URI: https://redicate-hub.preview.emergentagent.com/auth/callback
+- Redirect URI: https://server-dashboard-11.preview.emergentagent.com/auth/callback
 
 ---
 
