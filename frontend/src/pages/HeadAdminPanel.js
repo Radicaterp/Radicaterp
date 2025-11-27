@@ -85,16 +85,77 @@ const HeadAdminPanel = () => {
     );
   }
 
+  const tabs = [
+    { id: "team", label: "Mit Team", icon: "👥" },
+    { id: "overview", label: "Oversigt", icon: "📊" },
+    { id: "guide", label: "Guide", icon: "📚" }
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] bg-grid">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-6 py-8 mt-24">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2 gradient-text" data-testid="head-admin-panel-title">
+        <div className="mb-6 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 gradient-text" data-testid="head-admin-panel-title">
             Head Admin Panel
           </h1>
-          <p className="text-gray-400 text-lg">Administrer dit staff team</p>
+          <p className="text-gray-400">Administrer dit staff team</p>
+        </div>
+
+        {/* Dropdown for mobile + Small tabs for desktop */}
+        <div className="mb-8">
+          {/* Mobile Dropdown */}
+          <div className="md:hidden relative">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-[#4A90E2] transition-all"
+            >
+              <span className="flex items-center gap-2">
+                <span>{tabs.find(t => t.id === activeTab)?.icon}</span>
+                <span className="font-semibold">{tabs.find(t => t.id === activeTab)?.label}</span>
+              </span>
+              <ChevronDown className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 glass-card rounded-xl overflow-hidden z-10 border border-[#4A90E2]/30">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full p-4 text-left flex items-center gap-2 hover:bg-[#4A90E2]/20 transition-all ${
+                      activeTab === tab.id ? 'bg-[#4A90E2]/30 text-[#4A90E2]' : 'text-white'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span className="font-medium">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Small Tabs */}
+          <div className="hidden md:flex gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#4A90E2] text-white'
+                    : 'bg-[#1a1a1b] text-gray-400 hover:bg-[#4A90E2]/20 hover:text-white'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Team Info */}
