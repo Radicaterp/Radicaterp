@@ -97,18 +97,18 @@ const Home = () => {
           </div>
 
           {/* Server Stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
-            <div className="glass-card p-6 rounded-xl" data-testid="stat-players">
-              <div className="text-4xl font-bold text-[#4A90E2] mb-2">50+</div>
-              <div className="text-gray-400 text-sm">Aktive Spillere</div>
+          <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="glass-card corner-cut p-6" data-testid="stat-players">
+              <div className="text-sm text-[#00d9ff] font-mono mb-1 tracking-wider">&gt; SPILLERE</div>
+              <div className="text-4xl font-black text-white">50+</div>
             </div>
-            <div className="glass-card p-6 rounded-xl" data-testid="stat-jobs">
-              <div className="text-4xl font-bold text-[#4A90E2] mb-2">15+</div>
-              <div className="text-gray-400 text-sm">Whitelist Jobs</div>
+            <div className="glass-card corner-cut p-6" data-testid="stat-jobs">
+              <div className="text-sm text-[#00d9ff] font-mono mb-1 tracking-wider">&gt; JOBS</div>
+              <div className="text-4xl font-black text-white">15+</div>
             </div>
-            <div className="glass-card p-6 rounded-xl" data-testid="stat-uptime">
-              <div className="text-4xl font-bold text-[#4A90E2] mb-2">99%</div>
-              <div className="text-gray-400 text-sm">Uptime</div>
+            <div className="glass-card corner-cut p-6" data-testid="stat-uptime">
+              <div className="text-sm text-[#00d9ff] font-mono mb-1 tracking-wider">&gt; UPTIME</div>
+              <div className="text-4xl font-black text-white">99%</div>
             </div>
           </div>
         </div>
