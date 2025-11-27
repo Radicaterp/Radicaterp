@@ -219,12 +219,18 @@ async def update_discord_roles(discord_id: str, new_rank: str, remove_all_ranks:
             new_role = guild.get_role(int(new_role_id))
             if new_role:
                 await member.add_roles(new_role)
-                print(f"Updated {discord_id} to rank {new_rank}")
+                print(f"✅ Updated {discord_id} ({member.name}) to rank {new_rank}")
                 return True
+            else:
+                print(f"❌ Role {new_role_id} not found in guild")
+        else:
+            print(f"❌ No role mapping for rank {new_rank}")
         
         return False
     except Exception as e:
-        print(f"Failed to update Discord roles: {e}")
+        print(f"❌ Failed to update Discord roles: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 async def notify_firing_request(staff_username: str, staff_id: str, head_admin: str, reason: str):
