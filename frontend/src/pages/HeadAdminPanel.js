@@ -4,12 +4,15 @@ import Navbar from "../components/Navbar";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { ChevronDown } from "lucide-react";
 
 const HeadAdminPanel = () => {
   const { user } = useContext(AuthContext);
   const [myTeam, setMyTeam] = useState(null);
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("team");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     fetchMyTeam();
