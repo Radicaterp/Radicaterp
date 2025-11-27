@@ -142,6 +142,31 @@ class ApplicationCreate(BaseModel):
 class ApplicationReview(BaseModel):
     status: Literal["approved", "rejected"]
 
+class Report(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    reporter_id: str
+    reporter_username: str
+    reported_player: str
+    report_type: str  # RDM, VDM, FailRP, Metagaming, etc.
+    description: str
+    evidence: Optional[str] = None  # Links to clips/screenshots
+    status: Literal["pending", "investigating", "resolved", "dismissed"] = "pending"
+    submitted_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    handled_by: Optional[str] = None
+    handled_at: Optional[str] = None
+    admin_notes: Optional[str] = None
+
+class ReportCreate(BaseModel):
+    reported_player: str
+    report_type: str
+    description: str
+    evidence: Optional[str] = None
+
+class ReportUpdate(BaseModel):
+    status: Literal["investigating", "resolved", "dismissed"]
+    admin_notes: Optional[str] = None
+
 # Auth helpers
 async def get_current_user(request: Request) -> Optional[User]:
     session_token = request.cookies.get("session_token")
