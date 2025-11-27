@@ -46,40 +46,40 @@ const Navbar = () => {
               <>
                 <Link 
                   to="/applications" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/applications") ? "text-[#4A90E2]" : ""
+                  className={`text-sm font-bold tracking-wider transition-all ${
+                    isActive("/applications") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
                   }`}
                   data-testid="nav-applications"
                 >
-                  Ansøg
+                  [ ANSØG ]
                 </Link>
                 <Link 
                   to="/my-applications" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/my-applications") ? "text-[#4A90E2]" : ""
+                  className={`text-sm font-bold tracking-wider transition-all ${
+                    isActive("/my-applications") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
                   }`}
                   data-testid="nav-my-applications"
                 >
-                  Mine Ansøgninger
+                  [ STATUS ]
                 </Link>
                 <Link 
                   to="/report" 
-                  className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                    isActive("/report") ? "text-[#4A90E2]" : ""
+                  className={`text-sm font-bold tracking-wider transition-all ${
+                    isActive("/report") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
                   }`}
                   data-testid="nav-report"
                 >
-                  Rapportér
+                  [ REPORT ]
                 </Link>
                 {user.is_admin && (
                   <Link 
                     to="/admin" 
-                    className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                      isActive("/admin") ? "text-[#4A90E2]" : ""
+                    className={`text-sm font-bold tracking-wider transition-all ${
+                      isActive("/admin") ? "text-[#7b2ff7]" : "text-gray-400 hover:text-[#7b2ff7]"
                     }`}
                     data-testid="nav-admin"
                   >
-                    Admin
+                    [ ADMIN ]
                   </Link>
                 )}
               </>
@@ -87,40 +87,38 @@ const Navbar = () => {
             
             <Link 
               to="/staff" 
-              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                isActive("/staff") ? "text-[#4A90E2]" : ""
+              className={`text-sm font-bold tracking-wider transition-all ${
+                isActive("/staff") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
               }`}
               data-testid="nav-staff"
             >
-              Staff
+              [ STAFF ]
             </Link>
             
             <Link 
               to="/about" 
-              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                isActive("/about") ? "text-[#4A90E2]" : ""
+              className={`text-sm font-bold tracking-wider transition-all ${
+                isActive("/about") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
               }`}
               data-testid="nav-about"
             >
-              Om Os
+              [ INFO ]
             </Link>
 
             {/* User Info & Logout */}
             {user ? (
-              <div className="flex items-center gap-4 ml-4 pl-4 border-l border-[#4A90E2]/30">
+              <div className="flex items-center gap-3 ml-4 pl-4 border-l-2 border-[#00d9ff]">
                 <div className="text-right" data-testid="nav-user-info">
-                  <div className="text-white font-semibold text-sm">{user.username}</div>
-                  {user.is_admin && <div className="text-[#4A90E2] text-xs">Admin</div>}
+                  <div className="text-white font-bold text-xs tracking-wider">&gt; {user.username}</div>
+                  {user.is_admin && <div className="text-[#7b2ff7] text-xs font-mono">ADMIN</div>}
                 </div>
-                <Button 
+                <button
                   onClick={handleLogout}
-                  variant="outline"
-                  size="sm"
-                  className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10"
+                  className="text-xs font-bold text-red-500 hover:text-red-400 tracking-wider"
                   data-testid="logout-button"
                 >
-                  Log ud
-                </Button>
+                  [ EXIT ]
+                </button>
               </div>
             ) : null}
           </div>
