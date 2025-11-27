@@ -1,12 +1,14 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../App";
 import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -14,6 +16,10 @@ const Navbar = () => {
   };
 
   const isActive = (path) => location.pathname === path;
+  
+  const isAdminRouteActive = () => {
+    return isActive("/admin") || isActive("/head-admin") || isActive("/super-admin");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#4A90E2]/20" data-testid="navbar">
