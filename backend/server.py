@@ -377,6 +377,21 @@ class ApplicationCreate(BaseModel):
 class ApplicationReview(BaseModel):
     status: Literal["approved", "rejected"]
 
+class FiringRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    staff_id: str
+    staff_username: str
+    head_admin_id: str
+    head_admin_username: str
+    reason: str
+    strikes: List[dict]  # List of strikes with reasons
+    status: Literal["pending", "approved", "rejected"] = "pending"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[str] = None
+    discord_message_id: Optional[str] = None
+
 class Report(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
