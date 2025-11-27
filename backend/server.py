@@ -513,7 +513,8 @@ async def get_stats(user: User = Depends(require_admin)):
         "total_users": total_users,
         "total_application_types": total_app_types,
         "pending_applications": pending_apps,
-        "approved_applications": approved_apps
+        "approved_applications": approved_apps,
+        "pending_reports": pending_reports
     }
 
 # Include router
