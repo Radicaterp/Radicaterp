@@ -510,15 +510,22 @@ async def discord_callback(code: str, response: Response):
             )
             await db.users.insert_one(user_obj.model_dump())
         else:
+            # Always update ALL role-related fields to ensure demotions work
+            update_data = {
+                "username": username, 
+                "avatar": avatar, 
+                "is_admin": is_admin, 
+                "is_head_admin": is_head_admin,
+                "role": role_type
+            }
+            
+            # If user lost admin privileges, clear team_id
+            if not is_admin and existing_user.get("is_admin"):
+                update_data["team_id"] = None
+            
             await db.users.update_one(
                 {"discord_id": discord_id},
-                {"$set": {
-                    "username": username, 
-                    "avatar": avatar, 
-                    "is_admin": is_admin, 
-                    "is_head_admin": is_head_admin,
-                    "role": role_type
-                }}
+                {"$set": update_data}
             )
         
         # Create session
