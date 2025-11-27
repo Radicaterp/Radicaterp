@@ -204,6 +204,75 @@ God fornøjelse med dit nye team medlem! 🚀
     except Exception as e:
         print(f"Failed to send staff assignment DM: {e}")
 
+async def give_probation_role(discord_id: str):
+    """Give probation role to new staff member"""
+    if not discord_bot_client or not discord_bot_ready:
+        print(f"❌ Discord bot not ready")
+        return False
+    
+    try:
+        guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
+        if not guild:
+            print(f"❌ Guild {DISCORD_GUILD_ID} not found")
+            return False
+        
+        member = await guild.fetch_member(int(discord_id))
+        if not member:
+            print(f"❌ Member {discord_id} not found in guild")
+            return False
+        
+        # Add probation role
+        probation_role = guild.get_role(int(DISCORD_PROBATION_ROLE_ID))
+        if probation_role:
+            await member.add_roles(probation_role)
+            print(f"✅ Gave probation role to {discord_id} ({member.name})")
+            return True
+        else:
+            print(f"❌ Probation role {DISCORD_PROBATION_ROLE_ID} not found")
+            return False
+    except Exception as e:
+        print(f"❌ Failed to give probation role: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+async def upgrade_from_probation(discord_id: str):
+    """Upgrade staff member from probation to full staff"""
+    if not discord_bot_client or not discord_bot_ready:
+        print(f"❌ Discord bot not ready")
+        return False
+    
+    try:
+        guild = discord_bot_client.get_guild(int(DISCORD_GUILD_ID))
+        if not guild:
+            print(f"❌ Guild {DISCORD_GUILD_ID} not found")
+            return False
+        
+        member = await guild.fetch_member(int(discord_id))
+        if not member:
+            print(f"❌ Member {discord_id} not found in guild")
+            return False
+        
+        # Remove probation role
+        probation_role = guild.get_role(int(DISCORD_PROBATION_ROLE_ID))
+        if probation_role and probation_role in member.roles:
+            await member.remove_roles(probation_role)
+        
+        # Add perm staff role
+        perm_role = guild.get_role(int(DISCORD_PERM_STAFF_ROLE_ID))
+        if perm_role:
+            await member.add_roles(perm_role)
+            print(f"✅ Upgraded {discord_id} ({member.name}) from probation to full staff")
+            return True
+        else:
+            print(f"❌ Perm staff role {DISCORD_PERM_STAFF_ROLE_ID} not found")
+            return False
+    except Exception as e:
+        print(f"❌ Failed to upgrade from probation: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 async def update_discord_roles(discord_id: str, new_rank: str, remove_all_ranks: bool = False):
     """Update Discord roles for staff member"""
     if not discord_bot_client or not discord_bot_ready:
