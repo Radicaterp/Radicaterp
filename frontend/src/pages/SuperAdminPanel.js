@@ -267,9 +267,11 @@ const SuperAdminPanel = () => {
                 Opret Staff Team
               </Button>
             </form>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="add-staff">
+        {activeTab === "add-staff" && (
+          <div className="animate-fade-in">
             <form onSubmit={handleAddStaff} className="glass-card p-8 rounded-2xl space-y-6">
               <h2 className="text-2xl font-bold text-[#4A90E2]">Tilføj Staff Manuelt</h2>
               
