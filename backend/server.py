@@ -972,12 +972,18 @@ async def review_application(
     
     # If approved and it's a staff application
     if review.status == "approved" and application["application_type_name"].lower() == "staff":
-        # Find a team to assign (use provided team_id or find first available team)
+        # Find a team to assign (use provided team_id or randomly assign to one of the teams)
         if team_id:
             assigned_team = await db.staff_teams.find_one({"id": team_id}, {"_id": 0})
         else:
-            # Auto-assign to first available team
-            assigned_team = await db.staff_teams.find_one({}, {"_id": 0})
+            # Get all teams and randomly assign
+            all_teams = await db.staff_teams.find({}, {"_id": 0}).to_list(None)
+            if all_teams:
+                assigned_team = random.choice(all_teams)
+                print(f"🎲 Randomly assigned to team: {assigned_team['name']}")
+            else:
+                assigned_team = None
+                print("⚠️ No teams available for assignment")
         
         # Update user role to staff_member with starting rank
         # NOTE: They start with probation for 1 week
