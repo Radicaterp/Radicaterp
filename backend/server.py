@@ -525,8 +525,9 @@ async def discord_callback(code: str, response: Response):
         session_token = secrets.token_urlsafe(32)
         sessions[session_token] = discord_id
         
-        # Set cookie
-        response.set_cookie(
+        # Create redirect response and set cookie on it
+        redirect_response = RedirectResponse(url="https://www.redicate.dk")
+        redirect_response.set_cookie(
             key="session_token",
             value=session_token,
             domain=".redicate.dk",
@@ -536,8 +537,7 @@ async def discord_callback(code: str, response: Response):
             samesite="none"
         )
         
-        # Redirect back to frontend
-        return RedirectResponse(url="https://www.redicate.dk")
+        return redirect_response
 
 @api_router.get("/auth/me")
 async def get_current_user_info(user: User = Depends(require_auth)):
