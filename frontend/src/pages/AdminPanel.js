@@ -58,6 +58,15 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchReports = async () => {
+    try {
+      const response = await axios.get(`${API}/reports`, { withCredentials: true });
+      setReports(response.data);
+    } catch (error) {
+      console.error("Failed to fetch reports", error);
+    }
+  };
+
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${API}/stats`, { withCredentials: true });
