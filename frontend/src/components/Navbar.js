@@ -34,12 +34,12 @@ const Navbar = () => {
           <div className="flex items-center gap-6">
             <Link 
               to="/" 
-              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
-                isActive("/") ? "text-[#4A90E2]" : ""
+              className={`text-sm font-bold tracking-wider transition-all ${
+                isActive("/") ? "text-[#00d9ff]" : "text-gray-400 hover:text-[#00d9ff]"
               }`}
               data-testid="nav-home"
             >
-              Hjem
+              [ HOME ]
             </Link>
             
             {user && (
