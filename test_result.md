@@ -159,10 +159,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Send DM notification to staff when they receive a strike"
-    - "Create endpoint for Super Admins to remove strikes"
-    - "Add UI for Super Admins to remove strikes"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
