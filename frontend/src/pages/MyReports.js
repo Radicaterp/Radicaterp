@@ -266,7 +266,13 @@ const MyReports = () => {
                                   <div className="grid grid-cols-2 gap-4">
                                     <div>
                                       <label className="block text-sm text-gray-400 mb-2">Straf Type:</label>
-                                      <Select value={punishmentType} onValueChange={setPunishmentType}>
+                                      <Select value={punishmentType} onValueChange={(value) => {
+                                        setPunishmentType(value);
+                                        // Clear duration if warning selected (warnings don't have duration)
+                                        if (value === "warn") {
+                                          setPunishmentDuration("");
+                                        }
+                                      }}>
                                         <SelectTrigger className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white">
                                           <SelectValue placeholder="Vælg straf" />
                                         </SelectTrigger>
@@ -275,7 +281,7 @@ const MyReports = () => {
                                             ℹ️ Ingen Straf
                                           </SelectItem>
                                           <SelectItem value="warn" className="text-white hover:bg-[#4A90E2]/20">
-                                            ⚠️ Advarsel
+                                            ⚠️ Advarsel (1 Warning)
                                           </SelectItem>
                                           <SelectItem value="ban" className="text-white hover:bg-[#4A90E2]/20">
                                             🔨 Ban
@@ -284,7 +290,8 @@ const MyReports = () => {
                                       </Select>
                                     </div>
                                     
-                                    {punishmentType && punishmentType !== "none" && (
+                                    {/* Only show duration for ban, not for warn */}
+                                    {punishmentType === "ban" && (
                                       <div>
                                         <label className="block text-sm text-gray-400 mb-2">Varighed:</label>
                                         <Select value={punishmentDuration} onValueChange={setPunishmentDuration}>
@@ -318,6 +325,13 @@ const MyReports = () => {
                                             </SelectItem>
                                           </SelectContent>
                                         </Select>
+                                      </div>
+                                    )}
+                                    
+                                    {/* Info message for warnings */}
+                                    {punishmentType === "warn" && (
+                                      <div className="flex items-center text-sm text-yellow-400">
+                                        ⚠️ Warnings er altid 1 warning - ingen varighed
                                       </div>
                                     )}
                                   </div>
