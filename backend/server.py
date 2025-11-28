@@ -329,6 +329,8 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
             color = discord.Color.orange()
             punishment_emoji = "⚠️"
             punishment_text = "ADVARSEL (1 WARNING)"
+            # Force warnings to have no duration - always just 1 warning
+            punishment_duration = None
         else:
             color = discord.Color.grey()
             punishment_emoji = "ℹ️"
@@ -344,7 +346,8 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
         embed.add_field(name="👤 Rapporteret Spiller", value=reported_player, inline=True)
         embed.add_field(name="🔨 Straf Type", value=punishment_text, inline=True)
         
-        if punishment_duration and punishment_type != "none":
+        # Only show duration for bans, not warnings
+        if punishment_duration and punishment_type == "ban":
             embed.add_field(name="⏰ Varighed", value=punishment_duration, inline=True)
         
         embed.add_field(name="📝 Beskrivelse", value=description[:500] if description else "Ingen beskrivelse", inline=False)
