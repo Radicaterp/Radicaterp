@@ -937,7 +937,7 @@ async def check_discord_role(access_token: str) -> tuple[bool, str]:
             elif DISCORD_ADMIN_ROLE_ID in roles:
                 return True, "staff"
             elif DISCORD_STAFF_MEMBER_ROLE_ID in roles:
-                return False, "staff_member"  # Approved staff in team, but no admin access
+                return True, "staff_member"  # Staff members can also view/handle reports
             
             return False, "player"
     except Exception as e:
