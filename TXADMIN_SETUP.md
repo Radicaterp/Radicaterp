@@ -112,21 +112,11 @@ Reporter får Discord DM ved:
 
 ## Troubleshooting
 
-### Problem: "TxAdmin API key not configured"
-**Løsning:** Tjek at `TXADMIN_API_KEY` er sat i Railway environment variables
-
 ### Problem: "Punishment channel not found"
 **Løsning:** 
 - Tjek at Discord bot er inviteret til serveren
 - Tjek at kanalen med ID `1444094682253492401` eksisterer
 - Verificer bot har adgang til kanalen
-
-### Problem: TxAdmin API fejl
-**Løsning:**
-- Verificer TxAdmin URL er korrekt
-- Tjek at API key er valid
-- Sørg for at TxAdmin er online og tilgængelig
-- Tjek TxAdmin logs for fejl
 
 ### Problem: Knapper virker ikke
 **Løsning:**
