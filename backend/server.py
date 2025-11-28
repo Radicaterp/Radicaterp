@@ -319,9 +319,14 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
     
     try:
         # Get the punishment channel
+        print(f"[PUNISHMENT] Trying to get channel with ID: {DISCORD_PUNISHMENT_CHANNEL_ID}")
         channel = discord_bot_client.get_channel(int(DISCORD_PUNISHMENT_CHANNEL_ID))
+        print(f"[PUNISHMENT] Channel object: {channel}")
+        
         if not channel:
-            print(f"Punishment channel {DISCORD_PUNISHMENT_CHANNEL_ID} not found")
+            print(f"[PUNISHMENT ERROR] Channel {DISCORD_PUNISHMENT_CHANNEL_ID} not found!")
+            print(f"[PUNISHMENT ERROR] Bot may not have access to this channel or channel doesn't exist")
+            print(f"[PUNISHMENT ERROR] Available channels: {[c.name for c in discord_bot_client.guilds[0].channels if hasattr(discord_bot_client, 'guilds') and len(discord_bot_client.guilds) > 0] if discord_bot_client else 'No guilds'}")
             return
         
         # Set color and emoji based on punishment type
