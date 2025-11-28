@@ -72,7 +72,7 @@ const SearchApplications = () => {
         </div>
 
         {/* Search Bar */}
-        <Card className="bg-[#1a1a1b] border-[#4A90E2]/30 mb-6">
+        <Card className="glass-card border-[#4A90E2]/30 mb-6">
           <CardContent className="p-6">
             <div className="flex gap-4">
               <Input
