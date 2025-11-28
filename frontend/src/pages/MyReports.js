@@ -214,6 +214,52 @@ const MyReports = () => {
                                 <p className="text-gray-300 whitespace-pre-wrap">{selectedReport.admin_notes}</p>
                               </div>
                             )}
+                            
+                            {/* Admin/Staff Actions */}
+                            {user && user.is_admin && (
+                              <div className="mt-6 pt-6 border-t border-[#4A90E2]/30">
+                                <h4 className="font-semibold text-[#4A90E2] mb-4">Staff Behandling</h4>
+                                
+                                <div className="space-y-4">
+                                  <div>
+                                    <label className="block text-sm text-gray-400 mb-2">Opdater Status:</label>
+                                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                      <SelectTrigger className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white">
+                                        <SelectValue placeholder="Vælg status" />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-[#1a1a1b] border-[#4A90E2]/30">
+                                        <SelectItem value="investigating" className="text-white hover:bg-[#4A90E2]/20">
+                                          🔍 Undersøges
+                                        </SelectItem>
+                                        <SelectItem value="resolved" className="text-white hover:bg-[#4A90E2]/20">
+                                          ✅ Afsluttet
+                                        </SelectItem>
+                                        <SelectItem value="dismissed" className="text-white hover:bg-[#4A90E2]/20">
+                                          ❌ Afvist
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  
+                                  <div>
+                                    <label className="block text-sm text-gray-400 mb-2">Staff Notater:</label>
+                                    <Textarea
+                                      value={adminNotes}
+                                      onChange={(e) => setAdminNotes(e.target.value)}
+                                      placeholder="Tilføj notater om behandling af rapporten..."
+                                      className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white min-h-[100px]"
+                                    />
+                                  </div>
+                                  
+                                  <Button
+                                    onClick={() => handleUpdateReport(selectedReport.id)}
+                                    className="w-full bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90"
+                                  >
+                                    Opdater Rapport
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </DialogContent>
                       )}
