@@ -146,26 +146,173 @@ const FiveMPanel = () => {
     );
   }
 
+  const filteredPlayers = players.filter(p => 
+    p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.id?.toString().includes(searchQuery)
+  );
+
   return (
-    <div className="min-h-screen bg-[#0a0a0b] py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0b] via-[#0f0f10] to-[#0a0a0b] py-6 px-4">
+      <div className="max-w-[1800px] mx-auto">
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-bold gradient-text">FiveM ESX Admin Panel</h1>
-          <div className="flex gap-2">
-            <Button onClick={handleAnnouncement} className="bg-[#4A90E2]">
+          <div>
+            <h1 className="text-4xl font-bold gradient-text mb-2">FiveM Control Panel</h1>
+            <p className="text-gray-400 text-sm">Server: 45.84.198.57:30120</p>
+          </div>
+          <div className="flex gap-3">
+            <Button onClick={handleAnnouncement} className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5]">
               📢 Announcement
             </Button>
-            <Button onClick={fetchPlayers} className="bg-green-600">
+            <Button onClick={fetchPlayers} className="bg-gradient-to-r from-green-600 to-green-700">
               🔄 Refresh
             </Button>
           </div>
         </div>
 
-        <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
-          <CardHeader>
-            <CardTitle className="text-white">Online Spillere ({players.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-[#1a1a1b] border border-[#4A90E2]/20 p-1">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-[#4A90E2]">
+              📊 Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="players" className="data-[state=active]:bg-[#4A90E2]">
+              👥 Players ({players.length})
+            </TabsTrigger>
+            <TabsTrigger value="console" className="data-[state=active]:bg-[#4A90E2]">
+              💻 Live Console
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Dashboard Tab */}
+          <TabsContent value="dashboard" className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-br from-[#1a1a1b] to-[#0f0f10] border-[#4A90E2]/30">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">Players Online</p>
+                      <p className="text-3xl font-bold text-white">{serverStats.online}/{serverStats.maxPlayers}</p>
+                    </div>
+                    <div className="text-4xl">👥</div>
+                  </div>
+                  <div className="mt-3 w-full bg-[#0a0a0b] rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] h-2 rounded-full transition-all"
+                      style={{ width: `${(serverStats.online / serverStats.maxPlayers) * 100}%` }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-[#1a1a1b] to-[#0f0f10] border-green-500/30">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">Server Status</p>
+                      <p className="text-xl font-bold text-green-500">ONLINE</p>
+                    </div>
+                    <div className="text-4xl">✅</div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-3">Uptime: {serverStats.uptime}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-[#1a1a1b] to-[#0f0f10] border-purple-500/30">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">Resources</p>
+                      <p className="text-3xl font-bold text-white">{serverStats.resources}</p>
+                    </div>
+                    <div className="text-4xl">📦</div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-3">Active resources running</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-[#1a1a1b] to-[#0f0f10] border-orange-500/30">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">Framework</p>
+                      <p className="text-xl font-bold text-orange-500">ESX</p>
+                    </div>
+                    <div className="text-4xl">⚙️</div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-3">Legacy 1.2+</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
+              <CardHeader>
+                <CardTitle className="text-white">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <Button onClick={handleAnnouncement} className="bg-gradient-to-r from-blue-600 to-blue-700 h-20 flex flex-col items-center justify-center">
+                    <span className="text-2xl mb-1">📢</span>
+                    <span>Announcement</span>
+                  </Button>
+                  <Button onClick={fetchPlayers} className="bg-gradient-to-r from-green-600 to-green-700 h-20 flex flex-col items-center justify-center">
+                    <span className="text-2xl mb-1">🔄</span>
+                    <span>Refresh Data</span>
+                  </Button>
+                  <Button className="bg-gradient-to-r from-red-600 to-red-700 h-20 flex flex-col items-center justify-center">
+                    <span className="text-2xl mb-1">🔴</span>
+                    <span>Restart Server</span>
+                  </Button>
+                  <Button className="bg-gradient-to-r from-purple-600 to-purple-700 h-20 flex flex-col items-center justify-center">
+                    <span className="text-2xl mb-1">💾</span>
+                    <span>Backup</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
+              <CardHeader>
+                <CardTitle className="text-white">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {players.slice(0, 5).map(player => (
+                    <div key={player.id} className="flex items-center justify-between p-3 bg-[#0a0a0b] rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-white">{player.name}</span>
+                        <Badge variant="outline" className="text-gray-400">ID: {player.id}</Badge>
+                      </div>
+                      <span className="text-gray-400 text-sm">Connected • {player.ping}ms</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Players Tab */}
+          <TabsContent value="players" className="space-y-4">
+            {/* Search Bar */}
+            <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
+              <CardContent className="p-4">
+                <Input
+                  placeholder="🔍 Search players by name or ID..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white"
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
+              <CardHeader>
+                <CardTitle className="text-white">Online Players ({filteredPlayers.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
             {players.length === 0 ? (
               <p className="text-gray-400">Ingen spillere online.</p>
             ) : (
