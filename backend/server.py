@@ -1433,9 +1433,6 @@ async def remove_staff_member_completely(discord_id: str, user: User = Depends(r
 
 @api_router.post("/super-admin/staff/add")
 async def add_staff_member(staff_data: AddStaffMember, user: User = Depends(require_admin)):
-# Manual staff addition
-@api_router.post("/add-staff")
-async def add_staff_member(staff_data: AddStaffMember, user: User = Depends(require_admin)):
     # Check if user exists
     existing_user = await db.users.find_one({"discord_id": staff_data.discord_id})
     
