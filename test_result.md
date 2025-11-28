@@ -101,3 +101,63 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+
+user_problem_statement: "Implement strike notifications via DM and allow Super Admins to remove strikes from staff members"
+
+backend:
+  - task: "Send DM notification to staff when they receive a strike"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented send_strike_notification_dm function and integrated it into add_strike endpoint. Function sends Discord DM with strike details, reason, who gave the strike, and warning if 3 strikes reached."
+  
+  - task: "Create endpoint for Super Admins to remove strikes"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created POST /api/super-admin/strikes/remove/{discord_id} endpoint. Added require_super_admin auth function. Endpoint reduces strike count by 1 and adds a note to user's history."
+
+frontend:
+  - task: "Add UI for Super Admins to remove strikes"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/SuperAdminPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added new tab 'Administrer Staff' to SuperAdminPanel. Shows all staff members with their strikes, roles, teams. Added 'Fjern 1 Strike' button that calls the new backend endpoint."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Send DM notification to staff when they receive a strike"
+    - "Create endpoint for Super Admins to remove strikes"
+    - "Add UI for Super Admins to remove strikes"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implemented both features: 1) Strike DM notifications - sends Discord DM when a strike is added with details and warnings. 2) Super Admin strike removal - created backend endpoint and frontend UI in SuperAdminPanel to remove strikes. Both features need testing. NOTE: Discord bot token error still exists in logs but user confirmed it's not an issue."
