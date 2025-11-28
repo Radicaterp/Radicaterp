@@ -934,6 +934,50 @@ async def create_application(app_data: ApplicationCreate, user: User = Depends(r
     await db.applications.insert_one(application.model_dump())
     return application
 
+@api_router.get("/applications/search")
+async def search_user_applications(username: str = None, discord_id: str = None, user: User = Depends(require_admin)):
+    """Search for a user and get all their applications"""
+    if not username and not discord_id:
+        raise HTTPException(status_code=400, detail="Provide username or discord_id")
+    
+    # Find user
+    query = {}
+    if discord_id:
+        query["discord_id"] = discord_id
+    elif username:
+        query["username"] = {"$regex": username, "$options": "i"}
+    
+    # Get all users matching search
+    users = await db.users.find(query, {"_id": 0, "discord_id": 1, "username": 1, "avatar": 1, "role": 1}).to_list(10)
+    
+    if not users:
+        return {"users": [], "message": "Ingen brugere fundet"}
+    
+    # For each user, get their applications
+    results = []
+    for user_data in users:
+        applications = await db.applications.find(
+            {"user_id": user_data["discord_id"]},
+            {"_id": 0}
+        ).sort("submitted_at", -1).to_list(100)
+        
+        # Get application type details for each application
+        for app in applications:
+            app_type = await db.application_types.find_one(
+                {"id": app["application_type_id"]},
+                {"_id": 0, "name": 1, "questions": 1}
+            )
+            if app_type:
+                app["application_type_details"] = app_type
+        
+        results.append({
+            "user": user_data,
+            "applications": applications,
+            "total_applications": len(applications)
+        })
+    
+    return {"users": results, "total_users": len(results)}
+
 @api_router.get("/applications/{app_id}", response_model=Application)
 async def get_application(app_id: str, user: User = Depends(require_auth)):
     application = await db.applications.find_one({"id": app_id}, {"_id": 0})
