@@ -87,7 +87,8 @@ const SuperAdminPanel = () => {
   const tabs = [
     { id: "teams", label: "Staff Teams", icon: "👥", count: staffTeams.length },
     { id: "create", label: "Opret Team", icon: "➕" },
-    { id: "add-staff", label: "Tilføj Staff", icon: "👤" }
+    { id: "add-staff", label: "Tilføj Staff", icon: "👤" },
+    { id: "manage-staff", label: "Administrer Staff", icon: "⚙️" }
   ];
 
   return (
