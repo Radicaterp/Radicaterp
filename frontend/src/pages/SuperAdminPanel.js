@@ -369,8 +369,44 @@ const SuperAdminPanel = () => {
                               </div>
                             </div>
                             
-                            {staff.strikes > 0 && (
-                              <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2">
+                              {/* Transfer to another team */}
+                              {staffTeams.length > 1 && (
+                                <div className="flex gap-2 items-center">
+                                  <Select
+                                    onValueChange={async (newTeamId) => {
+                                      if (!window.confirm(`Overføre ${staff.username} til det valgte team?`)) return;
+                                      
+                                      try {
+                                        await axios.post(`${API}/super-admin/staff/transfer`, {
+                                          discord_id: staff.discord_id,
+                                          new_team_id: newTeamId
+                                        }, { withCredentials: true });
+                                        toast.success(`${staff.username} overført til nyt team`);
+                                        fetchData();
+                                      } catch (error) {
+                                        toast.error(error.response?.data?.detail || "Kunne ikke overføre staff");
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[180px] bg-[#0a0a0b] border-[#4A90E2]/30 text-white text-xs">
+                                      <SelectValue placeholder="Overføre til team" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#1a1a1b] border-[#4A90E2]/30">
+                                      {staffTeams
+                                        .filter(t => t.id !== team?.id)
+                                        .map((t) => (
+                                          <SelectItem key={t.id} value={t.id} className="text-white hover:bg-[#4A90E2]/20 text-xs">
+                                            {t.name}
+                                          </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
+                              
+                              {/* Remove strike button */}
+                              {staff.strikes > 0 && (
                                 <Button
                                   onClick={async () => {
                                     if (!window.confirm(`Er du sikker på du vil fjerne 1 strike fra ${staff.username}?`)) return;
@@ -388,8 +424,8 @@ const SuperAdminPanel = () => {
                                 >
                                   Fjern 1 Strike
                                 </Button>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
