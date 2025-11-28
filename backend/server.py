@@ -276,12 +276,16 @@ async def send_punishment_decision_to_reporter(reporter_id: str, reported_player
         if approved:
             embed = discord.Embed(
                 title="✅ Din Rapport - Straf Godkendt",
-                description=f"Straffen for **{reported_player}** er blevet godkendt og eksekveret.",
+                description=f"Straffen for **{reported_player}** er blevet godkendt af en administrator.",
                 color=discord.Color.green(),
                 timestamp=datetime.now(timezone.utc)
             )
             embed.add_field(name="👮 Godkendt af", value=decided_by, inline=False)
-            embed.add_field(name="📋 Status", value="Spilleren vil modtage straffen næste gang de joiner serveren.", inline=False)
+            embed.add_field(
+                name="📋 Næste Skridt", 
+                value="Straffen vil blive eksekveret af staff i TxAdmin. Spilleren vil modtage straffen næste gang de joiner serveren.", 
+                inline=False
+            )
         else:
             embed = discord.Embed(
                 title="❌ Din Rapport - Straf Afvist",
@@ -290,6 +294,11 @@ async def send_punishment_decision_to_reporter(reporter_id: str, reported_player
                 timestamp=datetime.now(timezone.utc)
             )
             embed.add_field(name="👮 Afvist af", value=decided_by, inline=False)
+            embed.add_field(
+                name="📋 Årsag", 
+                value="Straffen blev vurderet som ikke passende for denne overtrædelse, eller der var ikke tilstrækkeligt bevis.", 
+                inline=False
+            )
         
         embed.set_footer(text="Redicate Report System")
         await reporter_user.send(embed=embed)
