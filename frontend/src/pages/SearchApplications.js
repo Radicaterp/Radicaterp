@@ -52,10 +52,13 @@ const SearchApplications = () => {
 
   if (!user || !user.is_admin) {
     return (
-      <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl text-white mb-4">Adgang Nægtet</h1>
-          <p className="text-gray-400">Kun admins kan søge efter ansøgninger.</p>
+      <div className="min-h-screen bg-[#0a0a0b] bg-grid">
+        <Navbar />
+        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 100px)' }}>
+          <div className="text-center glass-card p-12 rounded-2xl">
+            <h1 className="text-2xl text-white mb-4">🔒 Adgang Nægtet</h1>
+            <p className="text-gray-400">Kun admins kan søge efter ansøgninger.</p>
+          </div>
         </div>
       </div>
     );
