@@ -37,12 +37,16 @@ Efter deployment kan du teste systemet:
    ↓
 4. Admin klikker "Godkend" eller "Afvis"
    ↓
-5a. GODKEND: TxAdmin API kalder warn/ban
-5b. AFVIS: Ingen action, reporter får besked
+5a. GODKEND: 
+    - Discord embed opdateres med TxAdmin command
+    - Admin får command i privat besked
+    - Reporter får DM om godkendelse
+    - Admin går til TxAdmin og kører command
+5b. AFVIS: 
+    - Ingen action
+    - Reporter får besked
    ↓
-6. Reporter modtager DM om beslutningen
-   ↓
-7. Næste gang spilleren joiner: TxAdmin viser warning/ban
+6. Spilleren får warn/ban næste gang de joiner
 ```
 
 ### Warning System
