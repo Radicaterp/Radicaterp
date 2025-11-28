@@ -62,9 +62,14 @@ const SearchApplications = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] py-12 px-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold gradient-text mb-8">Søg Ansøgninger</h1>
+    <div className="min-h-screen bg-[#0a0a0b] bg-grid">
+      <Navbar />
+      
+      <div className="max-w-7xl mx-auto px-6 py-8 mt-24">
+        <div className="mb-6 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 gradient-text">Søg Ansøgninger</h1>
+          <p className="text-gray-400">Find og gennemse ansøgninger fra brugere</p>
+        </div>
 
         {/* Search Bar */}
         <Card className="bg-[#1a1a1b] border-[#4A90E2]/30 mb-6">
