@@ -205,6 +205,149 @@ God fornøjelse med dit nye team medlem! 🚀
     except Exception as e:
         print(f"Failed to send staff assignment DM: {e}")
 
+async def send_transfer_notifications(
+    staff_discord_id: str,
+    staff_username: str,
+    old_head_admin_id: str,
+    old_team_name: str,
+    new_head_admin_id: str,
+    new_team_name: str,
+    admin_username: str
+):
+    """Send custom DM notifications to all parties involved in a staff transfer"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready for transfer notifications")
+        return
+    
+    try:
+        # 1. DM to the transferred staff member
+        try:
+            staff_user = await discord_bot_client.fetch_user(int(staff_discord_id))
+            if staff_user:
+                staff_embed = discord.Embed(
+                    title="🔄 Du er blevet overført til et nyt team!",
+                    description=f"Hej **{staff_username}**!\n\nDu er blevet overført til et nyt staff team.",
+                    color=discord.Color.blue(),
+                    timestamp=datetime.now(timezone.utc)
+                )
+                staff_embed.add_field(
+                    name="📤 Fra Team",
+                    value=old_team_name,
+                    inline=True
+                )
+                staff_embed.add_field(
+                    name="📥 Til Team",
+                    value=new_team_name,
+                    inline=True
+                )
+                staff_embed.add_field(
+                    name="👤 Din Nye Head Admin",
+                    value=f"<@{new_head_admin_id}>",
+                    inline=False
+                )
+                staff_embed.add_field(
+                    name="⚙️ Overført af",
+                    value=admin_username,
+                    inline=True
+                )
+                staff_embed.add_field(
+                    name="📝 Næste Skridt",
+                    value="• Kontakt din nye Head Admin\n• Få info om dit nye teams arbejdsområde\n• Fortsæt dit gode arbejde!",
+                    inline=False
+                )
+                staff_embed.set_footer(text="Redicate RP Staff System")
+                
+                await staff_user.send(embed=staff_embed)
+                print(f"✅ Sent transfer DM to staff member {staff_username}")
+        except Exception as e:
+            print(f"❌ Could not send DM to staff member: {e}")
+        
+        # 2. DM to old head admin (if exists)
+        if old_head_admin_id:
+            try:
+                old_head_admin = await discord_bot_client.fetch_user(int(old_head_admin_id))
+                if old_head_admin:
+                    old_ha_embed = discord.Embed(
+                        title="📤 Staff medlem overført fra dit team",
+                        description=f"Et af dine team medlemmer er blevet overført til et andet team.",
+                        color=discord.Color.orange(),
+                        timestamp=datetime.now(timezone.utc)
+                    )
+                    old_ha_embed.add_field(
+                        name="👤 Staff Medlem",
+                        value=f"**{staff_username}** (<@{staff_discord_id}>)",
+                        inline=False
+                    )
+                    old_ha_embed.add_field(
+                        name="📤 Fra",
+                        value=old_team_name,
+                        inline=True
+                    )
+                    old_ha_embed.add_field(
+                        name="📥 Til",
+                        value=new_team_name,
+                        inline=True
+                    )
+                    old_ha_embed.add_field(
+                        name="⚙️ Overført af",
+                        value=admin_username,
+                        inline=False
+                    )
+                    old_ha_embed.set_footer(text="Redicate RP Staff System")
+                    
+                    await old_head_admin.send(embed=old_ha_embed)
+                    print(f"✅ Sent transfer notification to old head admin")
+            except Exception as e:
+                print(f"❌ Could not send DM to old head admin: {e}")
+        
+        # 3. DM to new head admin
+        try:
+            new_head_admin = await discord_bot_client.fetch_user(int(new_head_admin_id))
+            if new_head_admin:
+                new_ha_embed = discord.Embed(
+                    title="📥 Nyt staff medlem overført til dit team!",
+                    description=f"Et staff medlem er blevet overført til **{new_team_name}**.",
+                    color=discord.Color.green(),
+                    timestamp=datetime.now(timezone.utc)
+                )
+                new_ha_embed.add_field(
+                    name="👤 Staff Medlem",
+                    value=f"**{staff_username}** (<@{staff_discord_id}>)",
+                    inline=False
+                )
+                new_ha_embed.add_field(
+                    name="📤 Fra Team",
+                    value=old_team_name,
+                    inline=True
+                )
+                new_ha_embed.add_field(
+                    name="📥 Til Team",
+                    value=new_team_name,
+                    inline=True
+                )
+                new_ha_embed.add_field(
+                    name="⚙️ Overført af",
+                    value=admin_username,
+                    inline=False
+                )
+                new_ha_embed.add_field(
+                    name="📋 HVAD NU?",
+                    value="• Kontakt det nye team medlem\n• Giv dem en intro til teamets arbejdsområde\n• Hjælp dem med at komme godt i gang",
+                    inline=False
+                )
+                new_ha_embed.set_footer(text="Redicate RP Staff System")
+                
+                await new_head_admin.send(embed=new_ha_embed)
+                print(f"✅ Sent transfer notification to new head admin")
+        except Exception as e:
+            print(f"❌ Could not send DM to new head admin: {e}")
+        
+        print(f"✅ All transfer notifications sent for {staff_username}")
+    except Exception as e:
+        print(f"❌ Failed to send transfer notifications: {e}")
+        import traceback
+        traceback.print_exc()
+
 async def give_probation_role(discord_id: str):
     """Give probation role to new staff member"""
     if not discord_bot_client or not discord_bot_ready:
