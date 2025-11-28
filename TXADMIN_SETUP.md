@@ -139,14 +139,26 @@ Reporter får Discord DM ved:
 ## Notes til Admins
 
 - **Warnings fjernes IKKE automatisk** - Tjek TxAdmin panel for at se spillers warning historik
-- Når du godkender en warn, får spilleren beskeden næste gang de joiner
+- Når du godkender en warn, får du TxAdmin command - HUSK at køre den i TxAdmin!
 - Godkend kun straffe hvis du har reviewet beviser grundigt
 - Afvis straffe hvis der ikke er nok bevis eller kontekst
+- **Vigtigt:** Discord giver dig command når du godkender - kopiér og kør den i TxAdmin console
+- Gem en log af eksekverede straffe for tracking
+
+## Workflow Best Practice
+
+1. **Review Report:** Læs rapport, tjek bevis
+2. **Klik Godkend/Afvis:** I Discord punishment channel
+3. **Kopiér Command:** Fra den private besked du får
+4. **Åbn TxAdmin:** Gå til din TxAdmin console
+5. **Kør Command:** Paste og enter
+6. **Verificer:** Tjek at straffen er registreret i TxAdmin
+7. **Test:** Tjek at spilleren får warn/ban når de joiner
 
 ## Support
 
-Hvis du oplever problemer med TxAdmin integration:
+Hvis du oplever problemer:
 1. Tjek Railway logs for backend fejl
-2. Tjek TxAdmin logs for API fejl
-3. Verificer alle environment variables er sat korrekt
-4. Test Discord bot permissions
+2. Verificer Discord bot permissions
+3. Test Discord button callbacks
+4. Verificer TxAdmin er online og tilgængelig
