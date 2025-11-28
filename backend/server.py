@@ -252,7 +252,7 @@ async def send_punishment_decision_to_reporter(reporter_id: str, reported_player
             embed.add_field(name="👮 Godkendt af", value=decided_by, inline=False)
             embed.add_field(
                 name="📋 Næste Skridt", 
-                value="Straffen vil blive eksekveret af staff i TxAdmin. Spilleren vil modtage straffen næste gang de joiner serveren.", 
+                value="Staff vil eksekvere straffen. Spilleren vil modtage straffen snarest.", 
                 inline=False
             )
         else:
