@@ -244,6 +244,16 @@ const Navbar = () => {
             </Link>
             
             <Link 
+              to="/faq" 
+              className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
+                isActive("/faq") ? "text-[#4A90E2]" : ""
+              }`}
+              data-testid="nav-faq"
+            >
+              FAQ
+            </Link>
+            
+            <Link 
               to="/about" 
               className={`text-gray-300 hover:text-[#4A90E2] transition-colors font-medium ${
                 isActive("/about") ? "text-[#4A90E2]" : ""
