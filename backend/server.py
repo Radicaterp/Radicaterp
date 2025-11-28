@@ -242,8 +242,104 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
-async def send_punishment_to_channel(report_id: str, reported_player: str, report_type: str, punishment_type: str, punishment_duration: str, handled_by: str, description: str, evidence: str = None):
-    """Send punishment notification to Discord punishment channel"""
+async def execute_txadmin_punishment(player_name: str, punishment_type: str, duration: str, reason: str, admin_name: str):
+    """Execute punishment via TxAdmin API"""
+    if not TXADMIN_API_KEY:
+        print("TxAdmin API key not configured")
+        return False
+    
+    try:
+        # Convert duration to seconds for TxAdmin
+        duration_seconds = 0
+        if "time" in duration.lower():
+            hours = int(duration.split()[0])
+            duration_seconds = hours * 3600
+        elif "dag" in duration.lower():
+            days = int(duration.split()[0])
+            duration_seconds = days * 86400
+        elif "permanent" in duration.lower():
+            duration_seconds = 0  # Permanent ban
+        
+        headers = {
+            "X-TxAdmin-Token": TXADMIN_API_KEY,
+            "Content-Type": "application/json"
+        }
+        
+        if punishment_type == "warn":
+            # TxAdmin warn action - warns persist and show on player join
+            payload = {
+                "action": "warn_player",
+                "player": player_name,
+                "reason": reason,
+                "author": admin_name
+            }
+        elif punishment_type == "ban":
+            # TxAdmin ban action
+            payload = {
+                "action": "ban_player",
+                "player": player_name,
+                "reason": reason,
+                "duration": duration_seconds if duration_seconds > 0 else None,
+                "author": admin_name
+            }
+        else:
+            return False
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{TXADMIN_URL}/player/action",
+                headers=headers,
+                json=payload,
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                print(f"TxAdmin {punishment_type} executed for {player_name}")
+                return True
+            else:
+                print(f"TxAdmin API error: {response.status_code} - {response.text}")
+                return False
+                
+    except Exception as e:
+        print(f"Error executing TxAdmin punishment: {e}")
+        return False
+
+async def send_punishment_decision_to_reporter(reporter_id: str, reported_player: str, approved: bool, decided_by: str):
+    """Notify reporter about punishment decision"""
+    if not discord_bot_client or not discord_bot_ready:
+        return
+    
+    try:
+        reporter_user = await discord_bot_client.fetch_user(int(reporter_id))
+        if not reporter_user:
+            return
+        
+        if approved:
+            embed = discord.Embed(
+                title="✅ Din Rapport - Straf Godkendt",
+                description=f"Straffen for **{reported_player}** er blevet godkendt og eksekveret.",
+                color=discord.Color.green(),
+                timestamp=datetime.now(timezone.utc)
+            )
+            embed.add_field(name="👮 Godkendt af", value=decided_by, inline=False)
+            embed.add_field(name="📋 Status", value="Spilleren vil modtage straffen næste gang de joiner serveren.", inline=False)
+        else:
+            embed = discord.Embed(
+                title="❌ Din Rapport - Straf Afvist",
+                description=f"Straffen for **{reported_player}** er blevet afvist af en administrator.",
+                color=discord.Color.red(),
+                timestamp=datetime.now(timezone.utc)
+            )
+            embed.add_field(name="👮 Afvist af", value=decided_by, inline=False)
+        
+        embed.set_footer(text="Redicate Report System")
+        await reporter_user.send(embed=embed)
+        
+    except Exception as e:
+        print(f"Error sending decision to reporter: {e}")
+
+async def send_punishment_to_channel(report_id: str, reported_player: str, report_type: str, punishment_type: str, punishment_duration: str, handled_by: str, description: str, evidence: str = None, reporter_id: str = None):
+    """Send punishment notification to Discord punishment channel with approval buttons"""
     if not discord_bot_client or not discord_bot_ready:
         print("Discord bot not ready for punishment notification")
         return
@@ -263,7 +359,7 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
         elif punishment_type == "warn":
             color = discord.Color.orange()
             punishment_emoji = "⚠️"
-            punishment_text = "ADVARSEL"
+            punishment_text = "ADVARSEL (1 WARNING)"
         else:
             color = discord.Color.grey()
             punishment_emoji = "ℹ️"
@@ -272,7 +368,7 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
         # Create embed
         embed = discord.Embed(
             title=f"{punishment_emoji} {punishment_text} - {reported_player}",
-            description=f"**Rapport Type:** {report_type}",
+            description=f"**Rapport Type:** {report_type}\n\n⚠️ Kræver godkendelse før eksekvering",
             color=color,
             timestamp=datetime.now(timezone.utc)
         )
@@ -287,13 +383,27 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
         if evidence:
             embed.add_field(name="🔗 Bevis", value=evidence[:500], inline=False)
         
-        embed.add_field(name="👮 Behandlet af", value=handled_by, inline=True)
+        embed.add_field(name="👮 Foreslået af", value=handled_by, inline=True)
         embed.add_field(name="📋 Rapport ID", value=report_id, inline=True)
         
-        embed.set_footer(text="Redicate Punishment System")
+        embed.set_footer(text="⏳ Afventer Godkendelse")
         
-        await channel.send(embed=embed)
-        print(f"Punishment notification sent to channel for {reported_player}")
+        # Store punishment data for button callback
+        punishment_id = f"{report_id}_{datetime.now(timezone.utc).timestamp()}"
+        pending_punishments[punishment_id] = {
+            "report_id": report_id,
+            "reported_player": reported_player,
+            "punishment_type": punishment_type,
+            "punishment_duration": punishment_duration,
+            "description": description,
+            "reporter_id": reporter_id
+        }
+        
+        # Create view with buttons
+        view = PunishmentView(punishment_id)
+        
+        await channel.send(embed=embed, view=view)
+        print(f"Punishment notification with buttons sent to channel for {reported_player}")
         
     except Exception as e:
         print(f"Error sending punishment to channel: {e}")
