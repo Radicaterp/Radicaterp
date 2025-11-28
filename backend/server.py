@@ -263,11 +263,6 @@ async def send_punishment_decision_to_reporter(reporter_id: str, reported_player
                 timestamp=datetime.now(timezone.utc)
             )
             embed.add_field(name="👮 Afvist af", value=decided_by, inline=False)
-            embed.add_field(
-                name="📋 Årsag", 
-                value="Straffen blev vurderet som ikke passende for denne overtrædelse, eller der var ikke tilstrækkeligt bevis.", 
-                inline=False
-            )
         
         embed.set_footer(text="Redicate Report System")
         await reporter_user.send(embed=embed)
