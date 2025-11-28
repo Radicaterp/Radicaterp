@@ -73,15 +73,19 @@ const MyReports = () => {
         `${API}/reports/${reportId}`,
         {
           status: selectedStatus,
-          admin_notes: adminNotes
+          admin_notes: adminNotes,
+          punishment_type: punishmentType || null,
+          punishment_duration: punishmentDuration || null
         },
         { withCredentials: true }
       );
-      toast.success("Rapport opdateret");
+      toast.success("Rapport opdateret og notifikationer sendt");
       fetchMyReports();
       setSelectedReport(null);
       setAdminNotes("");
       setSelectedStatus("");
+      setPunishmentType("");
+      setPunishmentDuration("");
     } catch (error) {
       toast.error(error.response?.data?.detail || "Kunne ikke opdatere rapport");
     }
