@@ -92,7 +92,7 @@ DISCORD_PUNISHMENT_CHANNEL_ID=1444094682253492401
 - Add Reactions
 
 ### Discord Developer Portal
-1. Enable "Message Content Intent"
+1. ~~Enable "Message Content Intent"~~ (IKKE nødvendigt - vi læser ikke beskeder)
 2. Verify bot has access to punishment channel
 3. Bot skal være inviteret til serveren
 
