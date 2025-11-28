@@ -12,11 +12,23 @@ const FiveMPanel = () => {
   const [players, setPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("players");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [serverStats, setServerStats] = useState({
+    online: 0,
+    maxPlayers: 64,
+    uptime: "0h 0m",
+    resources: 0
+  });
+  const [consoleLogs, setConsoleLogs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchPlayers();
-    const interval = setInterval(fetchPlayers, 5000);
+    fetchServerStats();
+    const interval = setInterval(() => {
+      fetchPlayers();
+      fetchServerStats();
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -24,8 +36,18 @@ const FiveMPanel = () => {
     try {
       const response = await axios.get(`${API}/fivem/players`);
       setPlayers(response.data.players || []);
+      setServerStats(prev => ({ ...prev, online: response.data.players?.length || 0 }));
     } catch (error) {
       console.error("Failed to fetch players", error);
+    }
+  };
+
+  const fetchServerStats = async () => {
+    try {
+      const response = await axios.get(`${API}/fivem/stats`);
+      setServerStats(prev => ({ ...prev, ...response.data }));
+    } catch (error) {
+      console.error("Failed to fetch stats", error);
     }
   };
 
