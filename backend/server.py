@@ -1403,6 +1403,15 @@ async def add_strike(discord_id: str, strike_data: AddStrikeRequest, user: User 
         {"$push": {"notes": note}}
     )
     
+    # Send DM notification to staff member about the strike
+    await send_strike_notification_dm(
+        discord_id,
+        staff["username"],
+        new_strikes,
+        strike_data.reason,
+        user.username
+    )
+    
     # If 3 strikes, notify for firing
     if new_strikes >= 3:
         # Get all strikes for this staff member
