@@ -1456,6 +1456,40 @@ async def add_note(discord_id: str, note_data: AddNoteRequest, user: User = Depe
     
     return {"success": True}
 
+@api_router.post("/super-admin/strikes/remove/{discord_id}")
+async def remove_strike(discord_id: str, user: User = Depends(require_super_admin)):
+    """Remove a strike from a staff member (Super Admin only)"""
+    # Get staff member
+    staff = await db.users.find_one({"discord_id": discord_id})
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    current_strikes = staff.get("strikes", 0)
+    
+    if current_strikes <= 0:
+        raise HTTPException(status_code=400, detail="Staff member has no strikes to remove")
+    
+    new_strikes = current_strikes - 1
+    
+    # Update strikes count
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {"strikes": new_strikes}}
+    )
+    
+    # Add note about strike removal
+    note = {
+        "text": f"✅ Strike fjernet af Super Admin (strikes: {current_strikes} → {new_strikes})",
+        "added_by": user.username,
+        "added_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$push": {"notes": note}}
+    )
+    
+    return {"success": True, "new_strikes": new_strikes}
+
 @api_router.post("/staff/my-team/members/{discord_id}/uprank")
 async def uprank_member(discord_id: str, uprank_data: UpRankRequest, user: User = Depends(require_head_admin)):
     """Uprank a team member"""
