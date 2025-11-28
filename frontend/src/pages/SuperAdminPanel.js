@@ -320,6 +320,85 @@ const SuperAdminPanel = () => {
             </form>
           </div>
         )}
+
+        {activeTab === "manage-staff" && (
+          <div className="animate-fade-in">
+            <div className="glass-card p-8 rounded-2xl">
+              <h2 className="text-2xl font-bold text-[#4A90E2] mb-6">Administrer Staff Medlemmer</h2>
+              
+              {allUsers.filter(u => ["staff_member", "admin", "head_admin"].includes(u.role)).length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-400">Ingen staff medlemmer fundet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {allUsers
+                    .filter(u => ["staff_member", "admin", "head_admin"].includes(u.role))
+                    .map((staff) => {
+                      const team = staffTeams.find(t => t.members.includes(staff.discord_id));
+                      return (
+                        <div key={staff.discord_id} className="bg-[#1a1a1b] p-6 rounded-xl border border-[#4A90E2]/20">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-bold text-white">{staff.username}</h3>
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  staff.role === "head_admin" ? "bg-purple-500/20 text-purple-400" :
+                                  staff.role === "admin" ? "bg-blue-500/20 text-blue-400" :
+                                  "bg-green-500/20 text-green-400"
+                                }`}>
+                                  {staff.role === "head_admin" ? "Head Admin" : staff.role === "admin" ? "Admin" : "Staff"}
+                                </span>
+                                {staff.strikes > 0 && (
+                                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400">
+                                    ⚠️ {staff.strikes} Strike{staff.strikes > 1 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-400">
+                                <p>Discord ID: <span className="text-gray-300">{staff.discord_id}</span></p>
+                                {staff.staff_rank && (
+                                  <p>Rank: <span className="text-[#4A90E2]">{staff.staff_rank}</span></p>
+                                )}
+                                {team && (
+                                  <p>Team: <span className="text-[#4A90E2]">{team.name}</span></p>
+                                )}
+                                {staff.on_probation && (
+                                  <p className="text-yellow-500">🕐 På prøvetid</p>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {staff.strikes > 0 && (
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  onClick={async () => {
+                                    if (!window.confirm(`Er du sikker på du vil fjerne 1 strike fra ${staff.username}?`)) return;
+                                    
+                                    try {
+                                      await axios.post(`${API}/super-admin/strikes/remove/${staff.discord_id}`, {}, { withCredentials: true });
+                                      toast.success(`Strike fjernet fra ${staff.username}`);
+                                      fetchData();
+                                    } catch (error) {
+                                      toast.error(error.response?.data?.detail || "Kunne ikke fjerne strike");
+                                    }
+                                  }}
+                                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90"
+                                  size="sm"
+                                >
+                                  Fjern 1 Strike
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
