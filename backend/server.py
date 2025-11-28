@@ -107,20 +107,26 @@ class PunishmentView(discord.ui.View):
             )
             
             if approved:
-                # Execute punishment via TxAdmin if it's a ban or warn
-                if punishment_data["punishment_type"] in ["ban", "warn"]:
-                    await execute_txadmin_punishment(
-                        punishment_data["reported_player"],
-                        punishment_data["punishment_type"],
-                        punishment_data["punishment_duration"],
-                        punishment_data["description"],
-                        interaction.user.name
-                    )
+                # Generate TxAdmin command
+                txadmin_cmd = generate_txadmin_command(
+                    punishment_data["reported_player"],
+                    punishment_data["punishment_type"],
+                    punishment_data["punishment_duration"],
+                    punishment_data["description"][:100]  # Limit reason length
+                )
                 
-                # Update embed to show approved
+                # Update embed to show approved with command
                 embed = interaction.message.embeds[0]
                 embed.color = discord.Color.green()
-                embed.set_footer(text=f"✅ GODKENDT af {interaction.user.name} - {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}")
+                
+                # Add TxAdmin command field
+                embed.add_field(
+                    name="🎮 TxAdmin Command",
+                    value=f"```{txadmin_cmd}```\n**Gå til TxAdmin og kør denne command!**",
+                    inline=False
+                )
+                
+                embed.set_footer(text=f"✅ GODKENDT af {interaction.user.name} - Nu skal straffen eksekveres i TxAdmin")
                 
                 # Notify reporter
                 await send_punishment_decision_to_reporter(
@@ -131,7 +137,10 @@ class PunishmentView(discord.ui.View):
                 )
                 
                 await interaction.response.edit_message(embed=embed, view=None)
-                await interaction.followup.send(f"✅ Straf godkendt og eksekveret!", ephemeral=True)
+                await interaction.followup.send(
+                    f"✅ Straf godkendt!\n\n**TxAdmin Command:**\n```{txadmin_cmd}```\nKopiér og kør denne command i TxAdmin console.", 
+                    ephemeral=True
+                )
             else:
                 # Update embed to show rejected
                 embed = interaction.message.embeds[0]
