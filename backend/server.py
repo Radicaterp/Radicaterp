@@ -151,7 +151,63 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
-async def send_report_status_notification(reporter_id: str, reporter_username: str, report_id: str, reported_player: str, report_type: str, new_status: str, handled_by: str, admin_notes: str = None):
+async def send_punishment_to_channel(report_id: str, reported_player: str, report_type: str, punishment_type: str, punishment_duration: str, handled_by: str, description: str, evidence: str = None):
+    """Send punishment notification to Discord punishment channel"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready for punishment notification")
+        return
+    
+    try:
+        # Get the punishment channel
+        channel = discord_bot_client.get_channel(int(DISCORD_PUNISHMENT_CHANNEL_ID))
+        if not channel:
+            print(f"Punishment channel {DISCORD_PUNISHMENT_CHANNEL_ID} not found")
+            return
+        
+        # Set color and emoji based on punishment type
+        if punishment_type == "ban":
+            color = discord.Color.red()
+            punishment_emoji = "🔨"
+            punishment_text = "BAN"
+        elif punishment_type == "warn":
+            color = discord.Color.orange()
+            punishment_emoji = "⚠️"
+            punishment_text = "ADVARSEL"
+        else:
+            color = discord.Color.grey()
+            punishment_emoji = "ℹ️"
+            punishment_text = "Ingen Straf"
+        
+        # Create embed
+        embed = discord.Embed(
+            title=f"{punishment_emoji} {punishment_text} - {reported_player}",
+            description=f"**Rapport Type:** {report_type}",
+            color=color,
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="👤 Rapporteret Spiller", value=reported_player, inline=True)
+        embed.add_field(name="🔨 Straf Type", value=punishment_text, inline=True)
+        
+        if punishment_duration and punishment_type != "none":
+            embed.add_field(name="⏰ Varighed", value=punishment_duration, inline=True)
+        
+        embed.add_field(name="📝 Beskrivelse", value=description[:500] if description else "Ingen beskrivelse", inline=False)
+        
+        if evidence:
+            embed.add_field(name="🔗 Bevis", value=evidence[:500], inline=False)
+        
+        embed.add_field(name="👮 Behandlet af", value=handled_by, inline=True)
+        embed.add_field(name="📋 Rapport ID", value=report_id, inline=True)
+        
+        embed.set_footer(text="Redicate Punishment System")
+        
+        await channel.send(embed=embed)
+        print(f"Punishment notification sent to channel for {reported_player}")
+        
+    except Exception as e:
+        print(f"Error sending punishment to channel: {e}")
+
+async def send_report_status_notification(reporter_id: str, reporter_username: str, report_id: str, reported_player: str, report_type: str, new_status: str, handled_by: str, admin_notes: str = None, punishment_type: str = None, punishment_duration: str = None):
     """Send DM to reporter when their report status is updated"""
     if not discord_bot_client or not discord_bot_ready:
         print("Discord bot not ready for report notification")
@@ -192,6 +248,25 @@ async def send_report_status_notification(reporter_id: str, reporter_username: s
         embed.add_field(name="👤 Rapporteret Spiller", value=reported_player, inline=True)
         embed.add_field(name="📝 Type", value=report_type, inline=True)
         embed.add_field(name="📊 Ny Status", value=f"{status_emoji} {status_text}", inline=True)
+        
+        # Add punishment information if provided
+        if punishment_type and punishment_type != "none":
+            if punishment_type == "ban":
+                punishment_emoji = "🔨"
+                punishment_text = "BAN"
+            elif punishment_type == "warn":
+                punishment_emoji = "⚠️"
+                punishment_text = "ADVARSEL"
+            else:
+                punishment_emoji = "ℹ️"
+                punishment_text = punishment_type.upper()
+            
+            punishment_info = f"{punishment_emoji} {punishment_text}"
+            if punishment_duration:
+                punishment_info += f" - {punishment_duration}"
+            
+            embed.add_field(name="🔨 Straf Givet", value=punishment_info, inline=False)
+        
         embed.add_field(name="👮 Behandlet af", value=handled_by, inline=False)
         
         if admin_notes:
