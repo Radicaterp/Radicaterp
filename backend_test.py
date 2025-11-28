@@ -194,6 +194,72 @@ class ReddicateAPITester:
             401
         )
 
+    def test_strike_removal_endpoints(self):
+        """Test Super Admin strike removal functionality"""
+        print("\n=== TESTING STRIKE REMOVAL ENDPOINTS ===")
+        
+        # Test remove strike without auth
+        self.run_test(
+            "Remove Strike (No Auth)",
+            "POST",
+            "super-admin/strikes/remove/123456789",
+            401
+        )
+        
+        # Test remove strike with invalid discord_id
+        self.run_test(
+            "Remove Strike (Invalid Discord ID)",
+            "POST", 
+            "super-admin/strikes/remove/invalid_id",
+            401  # Will fail auth first, but tests the endpoint exists
+        )
+        
+        # Test remove strike from non-existent user (would need auth)
+        self.run_test(
+            "Remove Strike (Non-existent User - No Auth)",
+            "POST",
+            "super-admin/strikes/remove/999999999999999999",
+            401
+        )
+
+    def test_staff_management_endpoints(self):
+        """Test staff management endpoints"""
+        print("\n=== TESTING STAFF MANAGEMENT ENDPOINTS ===")
+        
+        # Test get staff teams without auth
+        self.run_test(
+            "Get Staff Teams (No Auth)",
+            "GET",
+            "staff-teams",
+            401
+        )
+        
+        # Test get my team without auth
+        self.run_test(
+            "Get My Team (No Auth)",
+            "GET",
+            "staff/my-team",
+            401
+        )
+        
+        # Test add strike without auth
+        self.run_test(
+            "Add Strike (No Auth)",
+            "POST",
+            "staff/my-team/members/123456789/strike",
+            401,
+            data={"reason": "Test strike"}
+        )
+        
+        # Test add note without auth
+        self.run_test(
+            "Add Note (No Auth)",
+            "POST",
+            "staff/my-team/members/123456789/note",
+            401,
+            data={"note": "Test note"}
+        )
+
     def test_cors_and_headers(self):
         """Test CORS and header handling"""
         print("\n=== TESTING CORS AND HEADERS ===")
