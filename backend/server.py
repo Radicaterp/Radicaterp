@@ -55,8 +55,15 @@ RANK_TO_ROLE_ID = {
     "senior_admin": DISCORD_RANK_SENIOR_ADMIN
 }
 
+# TxAdmin Config
+TXADMIN_URL = os.environ.get('TXADMIN_URL', 'http://localhost:40120')
+TXADMIN_API_KEY = os.environ.get('TXADMIN_API_KEY', '')
+
 # Session storage
 sessions = {}
+
+# Pending punishments storage (for Discord button callbacks)
+pending_punishments = {}
 
 # Create the main app
 app = FastAPI()
