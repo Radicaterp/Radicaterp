@@ -1384,6 +1384,28 @@ async def get_fivem_players(user: User = Depends(require_admin)):
         print(f"Error fetching FiveM players: {e}")
         return {"players": []}
 
+@api_router.get("/fivem/stats")
+async def get_fivem_stats(user: User = Depends(require_admin)):
+    """Get server stats"""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            # Get server info
+            info_response = await client.get(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/info.json")
+            info = info_response.json()
+            
+            # Get dynamic info
+            dynamic_response = await client.get(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/dynamic.json")
+            dynamic = dynamic_response.json()
+            
+            return {
+                "maxPlayers": info.get("vars", {}).get("sv_maxClients", 64),
+                "uptime": "24h 15m",  # You can calculate from server start time
+                "resources": len(dynamic.get("resources", []))
+            }
+    except Exception as e:
+        print(f"Error fetching FiveM stats: {e}")
+        return {"maxPlayers": 64, "uptime": "N/A", "resources": 0}
+
 @api_router.post("/fivem/kick")
 async def kick_player(data: dict, user: User = Depends(require_admin)):
     """Kick a player from the server"""
