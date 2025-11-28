@@ -309,8 +309,12 @@ async def send_punishment_decision_to_reporter(reporter_id: str, reported_player
 
 async def send_punishment_to_channel(report_id: str, reported_player: str, report_type: str, punishment_type: str, punishment_duration: str, handled_by: str, description: str, evidence: str = None, reporter_id: str = None):
     """Send punishment notification to Discord punishment channel with approval buttons"""
+    print(f"[PUNISHMENT] Attempting to send punishment to channel for {reported_player}")
+    print(f"[PUNISHMENT] Bot client exists: {discord_bot_client is not None}, Bot ready: {discord_bot_ready}")
+    
     if not discord_bot_client or not discord_bot_ready:
-        print("Discord bot not ready for punishment notification")
+        print("[PUNISHMENT ERROR] Discord bot not ready - bot token may be invalid!")
+        print("[PUNISHMENT ERROR] Punishment notification cannot be sent. Please update DISCORD_BOT_TOKEN in Railway.")
         return
     
     try:
