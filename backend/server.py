@@ -1470,17 +1470,40 @@ async def update_report(report_id: str, update: ReportUpdate, user: User = Depen
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     
+    # Update report with new information
+    update_data = {
+        "status": update.status,
+        "admin_notes": update.admin_notes,
+        "handled_by": user.username,
+        "handled_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Add punishment info if provided
+    if update.punishment_type:
+        update_data["punishment_type"] = update.punishment_type
+        update_data["punishment_duration"] = update.punishment_duration
+    
     await db.reports.update_one(
         {"id": report_id},
-        {"$set": {
-            "status": update.status,
-            "admin_notes": update.admin_notes,
-            "handled_by": user.username,
-            "handled_at": datetime.now(timezone.utc).isoformat()
-        }}
+        {"$set": update_data}
     )
     
-    # Send DM notification to reporter about status update
+    # Send punishment to punishment channel if punishment was given
+    if update.punishment_type and update.punishment_type != "none":
+        asyncio.create_task(
+            send_punishment_to_channel(
+                report_id,
+                report["reported_player"],
+                report["report_type"],
+                update.punishment_type,
+                update.punishment_duration,
+                user.username,
+                report["description"],
+                report.get("evidence")
+            )
+        )
+    
+    # Send DM notification to reporter about ALL changes
     asyncio.create_task(
         send_report_status_notification(
             report["reporter_id"],
@@ -1490,7 +1513,9 @@ async def update_report(report_id: str, update: ReportUpdate, user: User = Depen
             report["report_type"],
             update.status,
             user.username,
-            update.admin_notes
+            update.admin_notes,
+            update.punishment_type,
+            update.punishment_duration
         )
     )
     
