@@ -60,6 +60,31 @@ const MyReports = () => {
     }
   };
 
+  const handleUpdateReport = async (reportId) => {
+    if (!selectedStatus) {
+      toast.error("Vælg en status");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `${API}/reports/${reportId}`,
+        {
+          status: selectedStatus,
+          admin_notes: adminNotes
+        },
+        { withCredentials: true }
+      );
+      toast.success("Rapport opdateret");
+      fetchMyReports();
+      setSelectedReport(null);
+      setAdminNotes("");
+      setSelectedStatus("");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Kunne ikke opdatere rapport");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
