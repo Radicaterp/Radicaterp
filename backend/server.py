@@ -1400,6 +1400,20 @@ async def update_report(report_id: str, update: ReportUpdate, user: User = Depen
         }}
     )
     
+    # Send DM notification to reporter about status update
+    asyncio.create_task(
+        send_report_status_notification(
+            report["reporter_id"],
+            report["reporter_username"],
+            report_id,
+            report["reported_player"],
+            report["report_type"],
+            update.status,
+            user.username,
+            update.admin_notes
+        )
+    )
+    
     return {"success": True}
 
 # Staff Teams endpoints
