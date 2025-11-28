@@ -155,6 +155,58 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
+
+
+---
+
+## New Feature: Staff Transfer Between Teams
+
+user_problem_statement: "Allow Super Admins to transfer staff members from one team to another"
+
+backend:
+  - task: "Transfer staff endpoint already exists"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/super-admin/staff/transfer endpoint already exists. Removes staff from old team, adds to new team, updates user's team_id, and sends DM notifications to staff member, old head admin, and new head admin."
+
+frontend:
+  - task: "Add transfer UI to SuperAdminPanel"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/SuperAdminPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added dropdown in 'Administrer Staff' tab that allows Super Admins to select a new team and transfer staff. Dropdown only shows teams different from staff's current team. Includes confirmation dialog and success/error toasts."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 2
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Transfer staff endpoint already exists"
+    - "Add transfer UI to SuperAdminPanel"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "User requested staff transfer functionality. Backend endpoint already exists from previous work. Added UI in SuperAdminPanel with dropdown to select new team. When team is selected, staff is transferred and DM notifications are sent to all parties (staff, old head admin, new head admin). Needs testing to verify transfer flow works correctly."
+
   test_sequence: 2
   run_ui: true
 
