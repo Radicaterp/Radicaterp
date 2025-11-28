@@ -488,6 +488,9 @@ class ReddicateAPITester:
         self.test_strike_removal_endpoints()
         self.test_staff_management_endpoints()
         self.test_staff_transfer_endpoints()
+        self.test_staff_member_report_access()
+        self.test_discord_role_check_functionality()
+        self.test_report_management_endpoints()
         self.test_cors_and_headers()
         
         # Print summary
