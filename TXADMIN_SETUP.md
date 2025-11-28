@@ -56,8 +56,26 @@ Efter deployment kan du teste systemet:
 
 ### Ban System  
 - Ban varighed sættes i report systemet (1 time, 1 dag, 7 dage, permanent, etc.)
-- TxAdmin executor bannet automatisk
+- System genererer TxAdmin command med korrekt syntax
+- Admin kører command i TxAdmin console
 - Spilleren kan ikke joine serveren før ban udløber
+
+### TxAdmin Commands Generated
+
+**Warning:**
+```
+/warn [player_name] [reason]
+```
+
+**Ban:**
+```
+/ban [player_name] [duration] [reason]
+```
+
+Eksempler:
+- `/warn JohnDoe RDM i Legion Square`
+- `/ban JaneDoe 7 dage Massevis af RDM`
+- `/ban BadPlayer perm Hacking og griefing`
 
 ## Discord Punishment Channel Features
 
