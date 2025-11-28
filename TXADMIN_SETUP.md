@@ -1,32 +1,11 @@
-# TxAdmin Integration Setup Guide
+# TxAdmin Manuel Punishment System
 
 ## Oversigt
-Dette system integrerer automatisk straffe (warns og bans) fra report systemet direkte til TxAdmin, så spillere modtager deres straf automatisk når de joiner serveren.
+Dette system giver et streamlined workflow hvor staff foreslår straffe via report systemet, admins godkender/afviser via Discord buttons, og derefter eksekverer straffen manuelt i TxAdmin med en autogenereret command.
 
 ## Setup Trin
 
-### 1. Få TxAdmin API Key
-
-1. Log ind på din TxAdmin panel (typisk `http://din-server-ip:40120`)
-2. Gå til **Settings** → **Admin Manager**
-3. Find eller opret en admin konto til API adgang
-4. Kopiér API Token/Key
-
-### 2. Opdater Railway Environment Variables
-
-Tilføj følgende environment variables i Railway:
-
-```
-TXADMIN_URL=http://din-server-ip:40120
-TXADMIN_API_KEY=din_api_key_her
-```
-
-**Vigtigt:** Hvis din FiveM server og Redicate website kører på samme netværk, kan du bruge:
-```
-TXADMIN_URL=http://localhost:40120
-```
-
-### 3. Discord Bot Permissions
+### 1. Discord Bot Permissions
 
 Sørg for at din Discord bot har følgende permissions i serveren:
 
