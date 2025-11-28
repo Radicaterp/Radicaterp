@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class ReddicateAPITester:
-    def __init__(self, base_url="https://server-dashboard-11.preview.emergentagent.com"):
+    def __init__(self, base_url="https://fivem-management.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session = requests.Session()
