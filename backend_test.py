@@ -340,6 +340,7 @@ class ReddicateAPITester:
         self.test_team_management_endpoints()
         self.test_strike_removal_endpoints()
         self.test_staff_management_endpoints()
+        self.test_staff_transfer_endpoints()
         self.test_cors_and_headers()
         
         # Print summary
