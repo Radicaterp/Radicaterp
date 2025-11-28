@@ -251,6 +251,66 @@ const MyReports = () => {
                                     </Select>
                                   </div>
                                   
+                                  {/* Punishment Selection */}
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-sm text-gray-400 mb-2">Straf Type:</label>
+                                      <Select value={punishmentType} onValueChange={setPunishmentType}>
+                                        <SelectTrigger className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white">
+                                          <SelectValue placeholder="Vælg straf" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#1a1a1b] border-[#4A90E2]/30">
+                                          <SelectItem value="none" className="text-white hover:bg-[#4A90E2]/20">
+                                            ℹ️ Ingen Straf
+                                          </SelectItem>
+                                          <SelectItem value="warn" className="text-white hover:bg-[#4A90E2]/20">
+                                            ⚠️ Advarsel
+                                          </SelectItem>
+                                          <SelectItem value="ban" className="text-white hover:bg-[#4A90E2]/20">
+                                            🔨 Ban
+                                          </SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    
+                                    {punishmentType && punishmentType !== "none" && (
+                                      <div>
+                                        <label className="block text-sm text-gray-400 mb-2">Varighed:</label>
+                                        <Select value={punishmentDuration} onValueChange={setPunishmentDuration}>
+                                          <SelectTrigger className="bg-[#0a0a0b] border-[#4A90E2]/30 text-white">
+                                            <SelectValue placeholder="Vælg varighed" />
+                                          </SelectTrigger>
+                                          <SelectContent className="bg-[#1a1a1b] border-[#4A90E2]/30">
+                                            <SelectItem value="1 time" className="text-white hover:bg-[#4A90E2]/20">
+                                              1 Time
+                                            </SelectItem>
+                                            <SelectItem value="6 timer" className="text-white hover:bg-[#4A90E2]/20">
+                                              6 Timer
+                                            </SelectItem>
+                                            <SelectItem value="1 dag" className="text-white hover:bg-[#4A90E2]/20">
+                                              1 Dag
+                                            </SelectItem>
+                                            <SelectItem value="3 dage" className="text-white hover:bg-[#4A90E2]/20">
+                                              3 Dage
+                                            </SelectItem>
+                                            <SelectItem value="7 dage" className="text-white hover:bg-[#4A90E2]/20">
+                                              7 Dage
+                                            </SelectItem>
+                                            <SelectItem value="14 dage" className="text-white hover:bg-[#4A90E2]/20">
+                                              14 Dage
+                                            </SelectItem>
+                                            <SelectItem value="30 dage" className="text-white hover:bg-[#4A90E2]/20">
+                                              30 Dage
+                                            </SelectItem>
+                                            <SelectItem value="Permanent" className="text-white hover:bg-[#4A90E2]/20">
+                                              Permanent
+                                            </SelectItem>
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
                                   <div>
                                     <label className="block text-sm text-gray-400 mb-2">Staff Notater:</label>
                                     <Textarea
@@ -265,7 +325,7 @@ const MyReports = () => {
                                     onClick={() => handleUpdateReport(selectedReport.id)}
                                     className="w-full bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90"
                                   >
-                                    Opdater Rapport
+                                    Opdater Rapport & Send Notifikationer
                                   </Button>
                                 </div>
                               </div>
