@@ -254,6 +254,7 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
 def generate_txadmin_command(player_name: str, punishment_type: str, duration: str, reason: str) -> str:
     """Generate TxAdmin command for manual execution"""
     if punishment_type == "warn":
+        # Warnings are always just 1 warning - no duration
         return f"/warn {player_name} {reason}"
     elif punishment_type == "ban":
         # Convert duration to TxAdmin format
