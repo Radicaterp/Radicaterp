@@ -14,6 +14,8 @@ const MyReports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [adminNotes, setAdminNotes] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
