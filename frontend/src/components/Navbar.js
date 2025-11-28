@@ -214,6 +214,18 @@ const Navbar = () => {
                             <div className="text-xs text-gray-400">Server Admin</div>
                           </Link>
                         )}
+                        {user.is_admin && (
+                          <Link
+                            to="/search-applications"
+                            onClick={() => setAdminDropdownOpen(false)}
+                            className={`block px-4 py-3 text-white hover:bg-[#4A90E2]/20 transition-colors ${
+                              isActive("/search-applications") ? "bg-[#4A90E2]/30" : ""
+                            }`}
+                          >
+                            <div className="font-medium">Søg Ansøgninger</div>
+                            <div className="text-xs text-gray-400">Find bruger ansøgninger</div>
+                          </Link>
+                        )}
                       </div>
                     )}
                   </div>
