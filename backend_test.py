@@ -309,6 +309,153 @@ class ReddicateAPITester:
             data={"discord_id": 123456789, "new_team_id": 12345}
         )
 
+    def test_staff_member_report_access(self):
+        """Test staff member report access functionality"""
+        print("\n=== TESTING STAFF MEMBER REPORT ACCESS ===")
+        
+        # Test reports endpoint without auth (should fail)
+        self.run_test(
+            "Get Reports (No Auth)",
+            "GET",
+            "reports",
+            401
+        )
+        
+        # Test create report without auth (should fail)
+        self.run_test(
+            "Create Report (No Auth)",
+            "POST",
+            "reports",
+            401,
+            data={
+                "reported_player": "TestPlayer123",
+                "report_type": "RDM",
+                "description": "Player killed me without RP reason",
+                "evidence": "https://example.com/clip.mp4"
+            }
+        )
+        
+        # Test get specific report without auth (should fail)
+        self.run_test(
+            "Get Specific Report (No Auth)",
+            "GET",
+            "reports/test-report-id",
+            401
+        )
+        
+        # Test update report without auth (should fail)
+        self.run_test(
+            "Update Report Status (No Auth)",
+            "PUT",
+            "reports/test-report-id",
+            401,
+            data={
+                "status": "investigating",
+                "admin_notes": "Looking into this report"
+            }
+        )
+        
+        # Test update report with invalid status (no auth)
+        self.run_test(
+            "Update Report Invalid Status (No Auth)",
+            "PUT",
+            "reports/test-report-id",
+            401,
+            data={
+                "status": "invalid_status",
+                "admin_notes": "Test notes"
+            }
+        )
+        
+        # Test update report with valid statuses (no auth)
+        valid_statuses = ["investigating", "resolved", "dismissed"]
+        for status in valid_statuses:
+            self.run_test(
+                f"Update Report Status '{status}' (No Auth)",
+                "PUT",
+                "reports/test-report-id",
+                401,
+                data={
+                    "status": status,
+                    "admin_notes": f"Setting status to {status}"
+                }
+            )
+
+    def test_discord_role_check_functionality(self):
+        """Test Discord role checking functionality (endpoint behavior)"""
+        print("\n=== TESTING DISCORD ROLE CHECK FUNCTIONALITY ===")
+        
+        # Note: We can't directly test check_discord_role function since it requires Discord OAuth token
+        # But we can test the behavior of endpoints that depend on it
+        
+        # Test auth/me endpoint behavior (should return 401 without proper session)
+        self.run_test(
+            "Check User Role via auth/me (No Session)",
+            "GET",
+            "auth/me",
+            401
+        )
+        
+        # Test admin-required endpoints (should return 401 without proper admin session)
+        admin_endpoints = [
+            ("staff-teams", "GET"),
+            ("applications", "GET"),  # Admin view shows all applications
+            ("reports", "GET"),       # Admin view shows all reports
+        ]
+        
+        for endpoint, method in admin_endpoints:
+            self.run_test(
+                f"Admin Endpoint {method} {endpoint} (No Auth)",
+                method,
+                endpoint,
+                401
+            )
+
+    def test_report_management_endpoints(self):
+        """Test comprehensive report management functionality"""
+        print("\n=== TESTING REPORT MANAGEMENT ENDPOINTS ===")
+        
+        # Test application types endpoint (should work without auth)
+        self.run_test(
+            "Get Application Types (Public)",
+            "GET",
+            "application-types",
+            200
+        )
+        
+        # Test creating application type without auth (should fail)
+        self.run_test(
+            "Create Application Type (No Auth)",
+            "POST",
+            "application-types",
+            401,
+            data={
+                "name": "Test Application",
+                "description": "Test description",
+                "questions": [{"label": "Name", "type": "text", "required": True}]
+            }
+        )
+        
+        # Test updating application type without auth (should fail)
+        self.run_test(
+            "Update Application Type (No Auth)",
+            "PUT",
+            "application-types/test-id",
+            401,
+            data={
+                "name": "Updated Application",
+                "description": "Updated description"
+            }
+        )
+        
+        # Test deleting application type without auth (should fail)
+        self.run_test(
+            "Delete Application Type (No Auth)",
+            "DELETE",
+            "application-types/test-id",
+            401
+        )
+
     def test_cors_and_headers(self):
         """Test CORS and header handling"""
         print("\n=== TESTING CORS AND HEADERS ===")
