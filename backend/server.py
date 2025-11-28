@@ -1129,24 +1129,11 @@ async def get_my_team(user: User = Depends(require_head_admin)):
 
 @api_router.delete("/staff/my-team/members/{discord_id}")
 async def remove_my_team_member(discord_id: str, user: User = Depends(require_head_admin)):
-    """Remove a member from head admin's team"""
-    team = await db.staff_teams.find_one({"head_admin_id": user.discord_id})
-    if not team:
-        raise HTTPException(status_code=404, detail="No team found")
-    
-    # Remove member from team
-    await db.staff_teams.update_one(
-        {"id": team["id"]},
-        {"$pull": {"members": discord_id}}
+    """DISABLED - Head admins cannot remove members. Contact super admin."""
+    raise HTTPException(
+        status_code=403, 
+        detail="Kun super admins kan fjerne team medlemmer. Kontakt en super admin for hjælp."
     )
-    
-    # Update user's team_id
-    await db.users.update_one(
-        {"discord_id": discord_id},
-        {"$set": {"team_id": None, "role": "player"}}
-    )
-    
-    return {"success": True}
 
 # Staff Management Endpoints (Strikes, Notes, Uprank)
 @api_router.post("/staff/my-team/members/{discord_id}/strike")
