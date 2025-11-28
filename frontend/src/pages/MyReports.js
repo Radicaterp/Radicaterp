@@ -97,9 +97,13 @@ const MyReports = () => {
         <div className="mb-8 flex justify-between items-center animate-fade-in">
           <div>
             <h1 className="text-5xl sm:text-6xl font-bold mb-2 gradient-text" data-testid="my-reports-title">
-              Mine Rapporter
+              {user && user.is_admin ? "Alle Rapporter" : "Mine Rapporter"}
             </h1>
-            <p className="text-gray-400 text-lg">Se status på dine indsendte rapporter</p>
+            <p className="text-gray-400 text-lg">
+              {user && user.is_admin 
+                ? "Se og behandl alle indsendte rapporter" 
+                : "Se status på dine indsendte rapporter"}
+            </p>
           </div>
           <Button
             onClick={() => navigate("/report")}
