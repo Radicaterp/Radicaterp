@@ -242,67 +242,17 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
-async def execute_txadmin_punishment(player_name: str, punishment_type: str, duration: str, reason: str, admin_name: str):
-    """Execute punishment via TxAdmin API"""
-    if not TXADMIN_API_KEY:
-        print("TxAdmin API key not configured")
-        return False
-    
-    try:
-        # Convert duration to seconds for TxAdmin
-        duration_seconds = 0
-        if "time" in duration.lower():
-            hours = int(duration.split()[0])
-            duration_seconds = hours * 3600
-        elif "dag" in duration.lower():
-            days = int(duration.split()[0])
-            duration_seconds = days * 86400
-        elif "permanent" in duration.lower():
-            duration_seconds = 0  # Permanent ban
-        
-        headers = {
-            "X-TxAdmin-Token": TXADMIN_API_KEY,
-            "Content-Type": "application/json"
-        }
-        
-        if punishment_type == "warn":
-            # TxAdmin warn action - warns persist and show on player join
-            payload = {
-                "action": "warn_player",
-                "player": player_name,
-                "reason": reason,
-                "author": admin_name
-            }
-        elif punishment_type == "ban":
-            # TxAdmin ban action
-            payload = {
-                "action": "ban_player",
-                "player": player_name,
-                "reason": reason,
-                "duration": duration_seconds if duration_seconds > 0 else None,
-                "author": admin_name
-            }
+def generate_txadmin_command(player_name: str, punishment_type: str, duration: str, reason: str) -> str:
+    """Generate TxAdmin command for manual execution"""
+    if punishment_type == "warn":
+        return f"/warn {player_name} {reason}"
+    elif punishment_type == "ban":
+        # Convert duration to TxAdmin format
+        if "permanent" in duration.lower():
+            return f"/ban {player_name} perm {reason}"
         else:
-            return False
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{TXADMIN_URL}/player/action",
-                headers=headers,
-                json=payload,
-                timeout=10.0
-            )
-            
-            if response.status_code == 200:
-                print(f"TxAdmin {punishment_type} executed for {player_name}")
-                return True
-            else:
-                print(f"TxAdmin API error: {response.status_code} - {response.text}")
-                return False
-                
-    except Exception as e:
-        print(f"Error executing TxAdmin punishment: {e}")
-        return False
+            return f"/ban {player_name} {duration} {reason}"
+    return ""
 
 async def send_punishment_decision_to_reporter(reporter_id: str, reported_player: str, approved: bool, decided_by: str):
     """Notify reporter about punishment decision"""
