@@ -73,9 +73,93 @@ api_router = APIRouter(prefix="/api")
 discord_bot_client = None
 discord_bot_ready = False
 
+class PunishmentView(discord.ui.View):
+    """Discord View for punishment approval buttons"""
+    def __init__(self, punishment_id: str):
+        super().__init__(timeout=None)  # No timeout
+        self.punishment_id = punishment_id
+    
+    @discord.ui.button(label="Godkend Straf", style=discord.ButtonStyle.green, custom_id="approve_punishment", emoji="✅")
+    async def approve_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_punishment_decision(interaction, True)
+    
+    @discord.ui.button(label="Afvis Straf", style=discord.ButtonStyle.red, custom_id="reject_punishment", emoji="❌")
+    async def reject_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_punishment_decision(interaction, False)
+    
+    async def handle_punishment_decision(self, interaction: discord.Interaction, approved: bool):
+        """Handle punishment approval/rejection"""
+        try:
+            # Get punishment details
+            punishment_data = pending_punishments.get(self.punishment_id)
+            if not punishment_data:
+                await interaction.response.send_message("❌ Straf data ikke fundet!", ephemeral=True)
+                return
+            
+            # Update punishment in database
+            await db.reports.update_one(
+                {"id": punishment_data["report_id"]},
+                {"$set": {
+                    "punishment_approved": approved,
+                    "punishment_approved_by": interaction.user.name,
+                    "punishment_approved_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            if approved:
+                # Execute punishment via TxAdmin if it's a ban or warn
+                if punishment_data["punishment_type"] in ["ban", "warn"]:
+                    await execute_txadmin_punishment(
+                        punishment_data["reported_player"],
+                        punishment_data["punishment_type"],
+                        punishment_data["punishment_duration"],
+                        punishment_data["description"],
+                        interaction.user.name
+                    )
+                
+                # Update embed to show approved
+                embed = interaction.message.embeds[0]
+                embed.color = discord.Color.green()
+                embed.set_footer(text=f"✅ GODKENDT af {interaction.user.name} - {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}")
+                
+                # Notify reporter
+                await send_punishment_decision_to_reporter(
+                    punishment_data["reporter_id"],
+                    punishment_data["reported_player"],
+                    True,
+                    interaction.user.name
+                )
+                
+                await interaction.response.edit_message(embed=embed, view=None)
+                await interaction.followup.send(f"✅ Straf godkendt og eksekveret!", ephemeral=True)
+            else:
+                # Update embed to show rejected
+                embed = interaction.message.embeds[0]
+                embed.color = discord.Color.grey()
+                embed.set_footer(text=f"❌ AFVIST af {interaction.user.name} - {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}")
+                
+                # Notify reporter
+                await send_punishment_decision_to_reporter(
+                    punishment_data["reporter_id"],
+                    punishment_data["reported_player"],
+                    False,
+                    interaction.user.name
+                )
+                
+                await interaction.response.edit_message(embed=embed, view=None)
+                await interaction.followup.send(f"❌ Straf afvist!", ephemeral=True)
+            
+            # Remove from pending
+            pending_punishments.pop(self.punishment_id, None)
+            
+        except Exception as e:
+            print(f"Error handling punishment decision: {e}")
+            await interaction.response.send_message(f"❌ Fejl: {str(e)}", ephemeral=True)
+
 class DiscordBot(discord.Client):
     def __init__(self):
         intents = discord.Intents.default()
+        intents.message_content = True
         super().__init__(intents=intents)
     
     async def on_ready(self):
