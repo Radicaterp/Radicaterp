@@ -1279,6 +1279,160 @@ async def remove_staff_member(team_id: str, discord_id: str, user: User = Depend
     )
     return {"success": True}
 
+async def send_transfer_notifications(staff_discord_id: str, staff_username: str, old_head_admin_id: str, old_team_name: str, new_head_admin_id: str, new_team_name: str, transferred_by: str):
+    """Send DM notifications about staff transfer"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready")
+        return
+    
+    try:
+        # Notify the transferred staff member
+        staff_user = await discord_bot_client.fetch_user(int(staff_discord_id))
+        if staff_user:
+            embed = discord.Embed(
+                title="📋 Du er blevet overført til et nyt team!",
+                description=f"Hej **{staff_username}**! Du er blevet overført til et nyt staff team.",
+                color=discord.Color.blue(),
+                timestamp=datetime.now(timezone.utc)
+            )
+            embed.add_field(name="🔄 Fra Team", value=old_team_name, inline=True)
+            embed.add_field(name="➡️ Til Team", value=new_team_name, inline=True)
+            embed.add_field(name="👤 Ny Head Admin", value=f"<@{new_head_admin_id}>", inline=True)
+            embed.add_field(name="⚙️ Overført af", value=transferred_by, inline=False)
+            embed.add_field(
+                name="📝 Næste Skridt",
+                value="• Kontakt din nye Head Admin\n• Få info om dit nye teams arbejdsområde\n• Fortsæt dit gode arbejde!",
+                inline=False
+            )
+            embed.set_footer(text="Redicate RP Staff System")
+            await staff_user.send(embed=embed)
+        
+        # Notify old head admin (if exists)
+        if old_head_admin_id:
+            old_head_admin = await discord_bot_client.fetch_user(int(old_head_admin_id))
+            if old_head_admin:
+                embed = discord.Embed(
+                    title="📤 Staff medlem overført fra dit team",
+                    description=f"**{staff_username}** er blevet overført fra dit team.",
+                    color=discord.Color.orange(),
+                    timestamp=datetime.now(timezone.utc)
+                )
+                embed.add_field(name="👤 Staff Medlem", value=f"<@{staff_discord_id}>", inline=True)
+                embed.add_field(name="➡️ Nyt Team", value=new_team_name, inline=True)
+                embed.add_field(name="⚙️ Overført af", value=transferred_by, inline=False)
+                embed.set_footer(text="Redicate RP Staff System")
+                await old_head_admin.send(embed=embed)
+        
+        # Notify new head admin
+        new_head_admin = await discord_bot_client.fetch_user(int(new_head_admin_id))
+        if new_head_admin:
+            embed = discord.Embed(
+                title="📥 Nyt staff medlem overført til dit team!",
+                description=f"**{staff_username}** er blevet overført til dit team.",
+                color=discord.Color.green(),
+                timestamp=datetime.now(timezone.utc)
+            )
+            embed.add_field(name="👤 Staff Medlem", value=f"<@{staff_discord_id}>", inline=True)
+            embed.add_field(name="🔄 Fra Team", value=old_team_name, inline=True)
+            embed.add_field(name="⚙️ Overført af", value=transferred_by, inline=False)
+            embed.add_field(
+                name="📋 HVAD NU?",
+                value="• Kontakt det nye team medlem\n• Giv dem en intro til teamets arbejdsområde\n• Hjælp dem med at komme godt i gang",
+                inline=False
+            )
+            embed.set_footer(text="Redicate RP Staff System")
+            await new_head_admin.send(embed=embed)
+        
+        print(f"Sent transfer notifications for {staff_username}")
+    except Exception as e:
+        print(f"Failed to send transfer notifications: {e}")
+
+@api_router.post("/super-admin/staff/transfer")
+async def transfer_staff_member(data: dict, user: User = Depends(require_admin)):
+    """Transfer a staff member from one team to another (Super Admin only)"""
+    discord_id = data.get("discord_id")
+    new_team_id = data.get("new_team_id")
+    
+    # Get staff member
+    staff_member = await db.users.find_one({"discord_id": discord_id}, {"_id": 0})
+    if not staff_member:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    old_team_id = staff_member.get("team_id")
+    old_team = await db.staff_teams.find_one({"id": old_team_id}, {"_id": 0}) if old_team_id else None
+    new_team = await db.staff_teams.find_one({"id": new_team_id}, {"_id": 0})
+    
+    if not new_team:
+        raise HTTPException(status_code=404, detail="New team not found")
+    
+    # Remove from old team
+    if old_team_id:
+        await db.staff_teams.update_one(
+            {"id": old_team_id},
+            {"$pull": {"members": discord_id}}
+        )
+    
+    # Add to new team
+    await db.staff_teams.update_one(
+        {"id": new_team_id},
+        {"$addToSet": {"members": discord_id}}
+    )
+    
+    # Update user's team_id
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {"team_id": new_team_id}}
+    )
+    
+    # Send DMs to all involved parties
+    asyncio.create_task(
+        send_transfer_notifications(
+            staff_member["discord_id"],
+            staff_member["username"],
+            old_team["head_admin_id"] if old_team else None,
+            old_team["name"] if old_team else "Ingen team",
+            new_team["head_admin_id"],
+            new_team["name"],
+            user.username
+        )
+    )
+    
+    return {"success": True, "message": f"{staff_member['username']} overført til {new_team['name']}"}
+
+@api_router.delete("/super-admin/staff/remove/{discord_id}")
+async def remove_staff_member_completely(discord_id: str, user: User = Depends(require_admin)):
+    """Remove a staff member completely (Super Admin only)"""
+    # Get staff member
+    staff_member = await db.users.find_one({"discord_id": discord_id}, {"_id": 0})
+    if not staff_member:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    team_id = staff_member.get("team_id")
+    
+    # Remove from team
+    if team_id:
+        await db.staff_teams.update_one(
+            {"id": team_id},
+            {"$pull": {"members": discord_id}}
+        )
+    
+    # Update user to player role
+    await db.users.update_one(
+        {"discord_id": discord_id},
+        {"$set": {
+            "team_id": None, 
+            "role": "player",
+            "is_admin": False,
+            "is_head_admin": False,
+            "staff_rank": None,
+            "strikes": 0
+        }}
+    )
+    
+    return {"success": True, "message": f"{staff_member['username']} fjernet fra staff"}
+
+@api_router.post("/super-admin/staff/add")
+async def add_staff_member(staff_data: AddStaffMember, user: User = Depends(require_admin)):
 # Manual staff addition
 @api_router.post("/add-staff")
 async def add_staff_member(staff_data: AddStaffMember, user: User = Depends(require_admin)):
