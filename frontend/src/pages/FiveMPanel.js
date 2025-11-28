@@ -313,45 +313,56 @@ const FiveMPanel = () => {
                 <CardTitle className="text-white">Online Players ({filteredPlayers.length})</CardTitle>
               </CardHeader>
               <CardContent>
-            {players.length === 0 ? (
-              <p className="text-gray-400">Ingen spillere online.</p>
+            {filteredPlayers.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">👥</div>
+                <p className="text-gray-400">Ingen spillere online lige nu</p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {players.map((player) => (
-                  <div key={player.id} className="bg-[#0a0a0b] p-4 rounded-lg border border-[#4A90E2]/20">
+              <div className="space-y-2">
+                {filteredPlayers.map((player) => (
+                  <div key={player.id} className="bg-gradient-to-r from-[#0a0a0b] to-[#0f0f10] p-4 rounded-lg border border-[#4A90E2]/20 hover:border-[#4A90E2]/50 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <p className="text-white font-semibold text-lg">{player.name}</p>
-                        <p className="text-gray-400 text-sm">ID: {player.id} | Ping: {player.ping}ms</p>
+                      <div className="flex items-center gap-4">
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <div>
+                          <p className="text-white font-semibold text-lg">{player.name}</p>
+                          <div className="flex gap-3 mt-1">
+                            <Badge variant="outline" className="text-xs">ID: {player.id}</Badge>
+                            <Badge variant="outline" className="text-xs text-green-400">{player.ping}ms</Badge>
+                            {player.job && <Badge className="text-xs bg-purple-600">{player.job}</Badge>}
+                            {player.money && <Badge className="text-xs bg-emerald-600">${player.money}</Badge>}
+                          </div>
+                        </div>
                       </div>
                       <Button 
                         size="sm" 
                         onClick={() => setSelectedPlayer(selectedPlayer === player.id ? null : player.id)}
-                        className="bg-[#4A90E2]"
+                        className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5]"
                       >
-                        {selectedPlayer === player.id ? "Skjul ▲" : "Vis Commands ▼"}
+                        {selectedPlayer === player.id ? "Hide ▲" : "Actions ▼"}
                       </Button>
                     </div>
                     
                     {selectedPlayer === player.id && (
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mt-4 pt-4 border-t border-[#4A90E2]/20">
-                        <Button size="sm" onClick={() => handleRevive(player.id)} className="bg-green-600">💚 Revive</Button>
-                        <Button size="sm" onClick={() => handleHeal(player.id)} className="bg-green-500">🩹 Heal</Button>
-                        <Button size="sm" onClick={() => handleArmor(player.id)} className="bg-blue-600">🛡️ Armor</Button>
-                        <Button size="sm" onClick={() => handleFreeze(player.id)} className="bg-cyan-600">❄️ Freeze</Button>
-                        <Button size="sm" onClick={() => handleUnfreeze(player.id)} className="bg-orange-500">🔥 Unfreeze</Button>
-                        <Button size="sm" onClick={() => handleBring(player.id)} className="bg-purple-600">📍 Bring</Button>
-                        <Button size="sm" onClick={() => handleGoto(player.id)} className="bg-purple-500">🚀 Goto</Button>
-                        <Button size="sm" onClick={() => handleTeleport(player.id)} className="bg-blue-500">📌 TP</Button>
-                        <Button size="sm" onClick={() => handleSpectate(player.id)} className="bg-indigo-600">👁️ Spectate</Button>
-                        <Button size="sm" onClick={() => handleGiveMoney(player.id)} className="bg-emerald-600">💰 Money</Button>
-                        <Button size="sm" onClick={() => handleSetJob(player.id)} className="bg-teal-600">💼 Set Job</Button>
-                        <Button size="sm" onClick={() => handleGiveItem(player.id)} className="bg-yellow-600">📦 Give Item</Button>
-                        <Button size="sm" onClick={() => handleGiveWeapon(player.id)} className="bg-red-500">🔫 Weapon</Button>
-                        <Button size="sm" onClick={() => handleClearInventory(player.id)} className="bg-orange-600">🗑️ Clear Inv</Button>
-                        <Button size="sm" onClick={() => handleKick(player.id)} className="bg-orange-700">👢 Kick</Button>
-                        <Button size="sm" onClick={() => handleBan(player.id)} className="bg-red-600">🔨 Ban</Button>
-                        <Button size="sm" onClick={() => handleWipe(player.id)} className="bg-red-900">⚠️ Wipe Data</Button>
+                        <Button size="sm" onClick={() => handleRevive(player.id)} className="bg-gradient-to-r from-green-600 to-green-700">💚 Revive</Button>
+                        <Button size="sm" onClick={() => handleHeal(player.id)} className="bg-gradient-to-r from-green-500 to-green-600">🩹 Heal</Button>
+                        <Button size="sm" onClick={() => handleArmor(player.id)} className="bg-gradient-to-r from-blue-600 to-blue-700">🛡️ Armor</Button>
+                        <Button size="sm" onClick={() => handleFreeze(player.id)} className="bg-gradient-to-r from-cyan-600 to-cyan-700">❄️ Freeze</Button>
+                        <Button size="sm" onClick={() => handleUnfreeze(player.id)} className="bg-gradient-to-r from-orange-500 to-orange-600">🔥 Unfreeze</Button>
+                        <Button size="sm" onClick={() => handleBring(player.id)} className="bg-gradient-to-r from-purple-600 to-purple-700">📍 Bring</Button>
+                        <Button size="sm" onClick={() => handleGoto(player.id)} className="bg-gradient-to-r from-purple-500 to-purple-600">🚀 Goto</Button>
+                        <Button size="sm" onClick={() => handleTeleport(player.id)} className="bg-gradient-to-r from-blue-500 to-blue-600">📌 TP</Button>
+                        <Button size="sm" onClick={() => handleSpectate(player.id)} className="bg-gradient-to-r from-indigo-600 to-indigo-700">👁️ Spectate</Button>
+                        <Button size="sm" onClick={() => handleGiveMoney(player.id)} className="bg-gradient-to-r from-emerald-600 to-emerald-700">💰 Money</Button>
+                        <Button size="sm" onClick={() => handleSetJob(player.id)} className="bg-gradient-to-r from-teal-600 to-teal-700">💼 Job</Button>
+                        <Button size="sm" onClick={() => handleGiveItem(player.id)} className="bg-gradient-to-r from-yellow-600 to-yellow-700">📦 Item</Button>
+                        <Button size="sm" onClick={() => handleGiveWeapon(player.id)} className="bg-gradient-to-r from-red-500 to-red-600">🔫 Weapon</Button>
+                        <Button size="sm" onClick={() => handleClearInventory(player.id)} className="bg-gradient-to-r from-orange-600 to-orange-700">🗑️ Clear</Button>
+                        <Button size="sm" onClick={() => handleKick(player.id)} className="bg-gradient-to-r from-orange-700 to-orange-800">👢 Kick</Button>
+                        <Button size="sm" onClick={() => handleBan(player.id)} className="bg-gradient-to-r from-red-600 to-red-700">🔨 Ban</Button>
+                        <Button size="sm" onClick={() => handleWipe(player.id)} className="bg-gradient-to-r from-red-900 to-black">⚠️ Wipe</Button>
                       </div>
                     )}
                   </div>
@@ -360,6 +371,35 @@ const FiveMPanel = () => {
             )}
           </CardContent>
         </Card>
+      </TabsContent>
+
+      {/* Live Console Tab */}
+      <TabsContent value="console">
+        <Card className="bg-[#1a1a1b] border-[#4A90E2]/30">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Live Console Feed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-[#0a0a0b] rounded-lg p-4 h-[600px] overflow-y-auto font-mono text-sm">
+              <div className="space-y-1">
+                <div className="text-green-400">[INFO] Server started successfully</div>
+                <div className="text-blue-400">[RESOURCE] Started redicate-admin</div>
+                <div className="text-yellow-400">[WARNING] High player count detected</div>
+                <div className="text-gray-400">[DEBUG] Player connected: {players[0]?.name}</div>
+                <div className="text-green-400">[INFO] ESX Framework loaded</div>
+                <div className="text-blue-400">[ADMIN] {user?.username} accessed admin panel</div>
+                <div className="text-gray-400 mt-4">─────────────────────────</div>
+                <div className="text-gray-500 italic">Console feed will appear here in real-time...</div>
+                <div className="text-gray-600 text-xs mt-2">Connect FiveM server resource for live updates</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
       </div>
     </div>
   );
