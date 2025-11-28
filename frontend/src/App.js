@@ -14,6 +14,7 @@ import Staff from "./pages/Staff";
 import HeadAdminPanel from "./pages/HeadAdminPanel";
 import SuperAdminPanel from "./pages/SuperAdminPanel";
 import FiveMPanel from "./pages/FiveMPanel";
+import SearchApplications from "./pages/SearchApplications";
 import { Toaster } from "@/components/ui/sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
