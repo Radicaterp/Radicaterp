@@ -111,6 +111,12 @@ function App() {
                 user && user.is_admin ? <FiveMPanel /> : <Navigate to="/" />
               }
             />
+            <Route
+              path="/search-applications"
+              element={
+                user && user.is_admin ? <SearchApplications /> : <Navigate to="/" />
+              }
+            />
           </Routes>
         </BrowserRouter>
       </div>
