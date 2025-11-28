@@ -118,6 +118,7 @@ function App() {
                 user && user.is_admin ? <SearchApplications /> : <Navigate to="/" />
               }
             />
+            <Route path="/faq" element={<FAQ />} />
           </Routes>
         </BrowserRouter>
       </div>
