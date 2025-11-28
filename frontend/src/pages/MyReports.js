@@ -218,6 +218,17 @@ const MyReports = () => {
                                 <p className="text-gray-300 whitespace-pre-wrap break-all">{selectedReport.evidence}</p>
                               </div>
                             )}
+                            {selectedReport.punishment_type && selectedReport.punishment_type !== "none" && (
+                              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                                <h4 className="font-semibold text-red-400 mb-1">🔨 Straf Givet:</h4>
+                                <div className="text-gray-300">
+                                  <p><span className="font-semibold">Type:</span> {selectedReport.punishment_type === "ban" ? "🔨 Ban" : "⚠️ Advarsel"}</p>
+                                  {selectedReport.punishment_duration && (
+                                    <p><span className="font-semibold">Varighed:</span> {selectedReport.punishment_duration}</p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                             {selectedReport.admin_notes && (
                               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                                 <h4 className="font-semibold text-blue-400 mb-1">Staff Notater:</h4>
