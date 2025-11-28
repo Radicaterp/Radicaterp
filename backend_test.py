@@ -260,6 +260,55 @@ class ReddicateAPITester:
             data={"note": "Test note"}
         )
 
+    def test_staff_transfer_endpoints(self):
+        """Test staff transfer functionality"""
+        print("\n=== TESTING STAFF TRANSFER ENDPOINTS ===")
+        
+        # Test transfer staff without auth
+        self.run_test(
+            "Transfer Staff (No Auth)",
+            "POST",
+            "super-admin/staff/transfer",
+            401,
+            data={"discord_id": "123456789", "new_team_id": "test-team-id"}
+        )
+        
+        # Test transfer staff with missing discord_id
+        self.run_test(
+            "Transfer Staff (Missing Discord ID - No Auth)",
+            "POST",
+            "super-admin/staff/transfer",
+            401,
+            data={"new_team_id": "test-team-id"}
+        )
+        
+        # Test transfer staff with missing new_team_id
+        self.run_test(
+            "Transfer Staff (Missing Team ID - No Auth)",
+            "POST",
+            "super-admin/staff/transfer",
+            401,
+            data={"discord_id": "123456789"}
+        )
+        
+        # Test transfer staff with empty data
+        self.run_test(
+            "Transfer Staff (Empty Data - No Auth)",
+            "POST",
+            "super-admin/staff/transfer",
+            401,
+            data={}
+        )
+        
+        # Test transfer staff with invalid data types
+        self.run_test(
+            "Transfer Staff (Invalid Data Types - No Auth)",
+            "POST",
+            "super-admin/staff/transfer",
+            401,
+            data={"discord_id": 123456789, "new_team_id": 12345}
+        )
+
     def test_cors_and_headers(self):
         """Test CORS and header handling"""
         print("\n=== TESTING CORS AND HEADERS ===")
