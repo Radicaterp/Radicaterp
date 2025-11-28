@@ -1700,7 +1700,8 @@ async def update_report(report_id: str, update: ReportUpdate, user: User = Depen
                 update.punishment_duration,
                 user.username,
                 report["description"],
-                report.get("evidence")
+                report.get("evidence"),
+                report["reporter_id"]  # Include reporter_id for notifications
             )
         )
     
