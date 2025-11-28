@@ -1453,16 +1453,147 @@ async def heal_player(data: dict, user: User = Depends(require_admin)):
 async def send_announcement(data: dict, user: User = Depends(require_admin)):
     """Send announcement to all players"""
     message = data.get("message")
-    
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            await client.post(
-                f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/announce",
-                json={"message": message, "admin": user.username}
-            )
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/announce",
+                json={"message": message, "admin": user.username})
         return {"success": True}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send announcement: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/revive")
+async def revive_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/revive",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/armor")
+async def give_armor(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/armor",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/freeze")
+async def freeze_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/freeze",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/unfreeze")
+async def unfreeze_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/unfreeze",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/give-money")
+async def give_money(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/give-money",
+                json={"player_id": data.get("player_id"), "amount": data.get("amount"), 
+                      "account": data.get("account"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/set-job")
+async def set_job(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/set-job",
+                json={"player_id": data.get("player_id"), "job": data.get("job"), 
+                      "grade": data.get("grade"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/give-item")
+async def give_item(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/give-item",
+                json={"player_id": data.get("player_id"), "item": data.get("item"), 
+                      "count": data.get("count"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/give-weapon")
+async def give_weapon(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/give-weapon",
+                json={"player_id": data.get("player_id"), "weapon": data.get("weapon"), 
+                      "ammo": data.get("ammo"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/bring")
+async def bring_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/bring",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/goto")
+async def goto_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/goto",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/spectate")
+async def spectate_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/spectate",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/clear-inventory")
+async def clear_inventory(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/clear-inventory",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/fivem/wipe-player")
+async def wipe_player(data: dict, user: User = Depends(require_admin)):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"http://{FIVEM_SERVER_IP}:{FIVEM_SERVER_PORT}/admin/wipe-player",
+                json={"player_id": data.get("player_id"), "admin": user.username})
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Include router
 app.include_router(api_router)
