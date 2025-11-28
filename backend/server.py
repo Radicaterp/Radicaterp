@@ -251,19 +251,6 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
-def generate_txadmin_command(player_name: str, punishment_type: str, duration: str, reason: str) -> str:
-    """Generate TxAdmin command for manual execution"""
-    if punishment_type == "warn":
-        # Warnings are always just 1 warning - no duration
-        return f"/warn {player_name} {reason}"
-    elif punishment_type == "ban":
-        # Convert duration to TxAdmin format
-        if "permanent" in duration.lower():
-            return f"/ban {player_name} perm {reason}"
-        else:
-            return f"/ban {player_name} {duration} {reason}"
-    return ""
-
 async def send_punishment_decision_to_reporter(reporter_id: str, reported_player: str, approved: bool, decided_by: str):
     """Notify reporter about punishment decision"""
     if not discord_bot_client or not discord_bot_ready:
