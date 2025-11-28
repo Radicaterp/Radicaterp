@@ -379,10 +379,12 @@ async def send_punishment_to_channel(report_id: str, reported_player: str, repor
         view = PunishmentView(punishment_id)
         
         await channel.send(embed=embed, view=view)
-        print(f"Punishment notification with buttons sent to channel for {reported_player}")
+        print(f"[PUNISHMENT SUCCESS] Notification with buttons sent to channel for {reported_player}")
         
     except Exception as e:
-        print(f"Error sending punishment to channel: {e}")
+        print(f"[PUNISHMENT ERROR] Error sending punishment to channel: {e}")
+        import traceback
+        traceback.print_exc()
 
 async def send_report_status_notification(reporter_id: str, reporter_username: str, report_id: str, reported_player: str, report_type: str, new_status: str, handled_by: str, admin_notes: str = None, punishment_type: str = None, punishment_duration: str = None):
     """Send DM to reporter when their report status is updated"""
