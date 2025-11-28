@@ -145,7 +145,7 @@ class PunishmentView(discord.ui.View):
 class DiscordBot(discord.Client):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.message_content = True
+        # No need for message_content intent - we only send messages, not read them
         super().__init__(intents=intents)
     
     async def on_ready(self):
