@@ -16,6 +16,8 @@ const MyReports = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [punishmentType, setPunishmentType] = useState("");
+  const [punishmentDuration, setPunishmentDuration] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
