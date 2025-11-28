@@ -150,6 +150,66 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
+async def send_report_status_notification(reporter_id: str, reporter_username: str, report_id: str, reported_player: str, report_type: str, new_status: str, handled_by: str, admin_notes: str = None):
+    """Send DM to reporter when their report status is updated"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready for report notification")
+        return
+    
+    try:
+        # Get reporter user
+        reporter_user = await discord_bot_client.fetch_user(int(reporter_id))
+        if not reporter_user:
+            print(f"Reporter {reporter_id} not found")
+            return
+        
+        # Set color based on status
+        if new_status == "resolved":
+            color = discord.Color.green()
+            status_emoji = "✅"
+            status_text = "Afsluttet"
+        elif new_status == "dismissed":
+            color = discord.Color.red()
+            status_emoji = "❌"
+            status_text = "Afvist"
+        elif new_status == "investigating":
+            color = discord.Color.blue()
+            status_emoji = "🔍"
+            status_text = "Under Undersøgelse"
+        else:
+            color = discord.Color.yellow()
+            status_emoji = "⏳"
+            status_text = "Afventer"
+        
+        # Create embed
+        embed = discord.Embed(
+            title=f"{status_emoji} Din Rapport Er Blevet Opdateret",
+            description=f"Status på din rapport om **{reported_player}** er blevet ændret.",
+            color=color,
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="👤 Rapporteret Spiller", value=reported_player, inline=True)
+        embed.add_field(name="📝 Type", value=report_type, inline=True)
+        embed.add_field(name="📊 Ny Status", value=f"{status_emoji} {status_text}", inline=True)
+        embed.add_field(name="👮 Behandlet af", value=handled_by, inline=False)
+        
+        if admin_notes:
+            embed.add_field(
+                name="💬 Staff Kommentar",
+                value=admin_notes[:1000],  # Limit to 1000 chars
+                inline=False
+            )
+        
+        embed.set_footer(text="Redicate Report System")
+        
+        await reporter_user.send(embed=embed)
+        print(f"Report status notification sent to {reporter_username}")
+        
+    except discord.Forbidden:
+        print(f"Cannot send DM to {reporter_username} - DMs are disabled")
+    except Exception as e:
+        print(f"Error sending report notification: {e}")
+
 async def send_strike_notification_dm(staff_discord_id: str, staff_username: str, strike_number: int, reason: str, added_by: str):
     """Send DM to staff member when they receive a strike"""
     if not discord_bot_client or not discord_bot_ready:
