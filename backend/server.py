@@ -150,6 +150,54 @@ async def send_discord_embed(user_id: str, username: str, app_type: str, status:
     except Exception as e:
         print(f"Failed to send Discord embed: {e}")
 
+async def send_strike_notification_dm(staff_discord_id: str, staff_username: str, strike_number: int, reason: str, added_by: str):
+    """Send DM to staff member when they receive a strike"""
+    if not discord_bot_client or not discord_bot_ready:
+        print("Discord bot not ready")
+        return
+    
+    try:
+        # Get staff user
+        staff_user = await discord_bot_client.fetch_user(int(staff_discord_id))
+        if not staff_user:
+            print(f"Staff user {staff_discord_id} not found")
+            return
+        
+        # Create embed
+        color = discord.Color.orange() if strike_number < 3 else discord.Color.red()
+        embed = discord.Embed(
+            title=f"⚠️ Du har modtaget en Strike ({strike_number}/3)",
+            description=f"Din Head Admin har givet dig en strike.",
+            color=color,
+            timestamp=datetime.now(timezone.utc)
+        )
+        embed.add_field(name="📝 Årsag", value=reason, inline=False)
+        embed.add_field(name="👤 Givet af", value=added_by, inline=True)
+        embed.add_field(name="📊 Strikes i alt", value=f"{strike_number}/3", inline=True)
+        
+        if strike_number >= 3:
+            embed.add_field(
+                name="🚨 KRITISK ADVARSEL",
+                value="Du har nu 3 strikes. Din Head Admin vil indstille dig til fyring. Du vil modtage besked om beslutningen.",
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="💡 Hvad nu?",
+                value="Tag kontakt til din Head Admin for at diskutere situationen og undgå yderligere strikes.",
+                inline=False
+            )
+        
+        embed.set_footer(text="Redicate Staff System")
+        
+        await staff_user.send(embed=embed)
+        print(f"Strike notification sent to {staff_username}")
+        
+    except discord.Forbidden:
+        print(f"Cannot send DM to {staff_username} - DMs are disabled")
+    except Exception as e:
+        print(f"Error sending strike notification: {e}")
+
 async def send_staff_assignment_dm(head_admin_id: str, new_staff_username: str, new_staff_id: str, team_name: str):
     """Send DM to head admin about new staff member with guide"""
     if not discord_bot_client or not discord_bot_ready:
