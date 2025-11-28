@@ -14,7 +14,7 @@ Sørg for at din Discord bot har følgende permissions i serveren:
 - **Use Application Commands**
 - **Read Message History**
 
-### 4. Test Integration
+### 2. Test System
 
 Efter deployment kan du teste systemet:
 
@@ -22,7 +22,8 @@ Efter deployment kan du teste systemet:
 2. Log ind som staff og behandl reporten
 3. Vælg en straf (Ban eller Warn)
 4. Tjek Discord kanalen `1444094682253492401` - der skulle nu være et embed med **Godkend/Afvis** knapper
-5. Klik på en af knapperne for at teste callback
+5. Klik **Godkend** - du får en TxAdmin command i en privat besked
+6. Gå til TxAdmin console og kør command'en
 
 ## Hvordan Det Virker
 
