@@ -909,6 +909,8 @@ class Report(BaseModel):
     handled_by: Optional[str] = None
     handled_at: Optional[str] = None
     admin_notes: Optional[str] = None
+    punishment_type: Optional[str] = None  # "ban", "warn", "none"
+    punishment_duration: Optional[str] = None  # "permanent", "1 day", "3 days", "7 days", etc.
 
 class ReportCreate(BaseModel):
     reported_player: str
@@ -919,6 +921,8 @@ class ReportCreate(BaseModel):
 class ReportUpdate(BaseModel):
     status: Literal["investigating", "resolved", "dismissed"]
     admin_notes: Optional[str] = None
+    punishment_type: Optional[str] = None  # "ban", "warn", "none"
+    punishment_duration: Optional[str] = None
 
 # Auth helpers
 async def get_current_user(request: Request) -> Optional[User]:
