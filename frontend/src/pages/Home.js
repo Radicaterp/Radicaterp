@@ -86,7 +86,7 @@ const Home = () => {
                   className="border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 text-xl px-10 py-7 rounded-xl font-bold shadow-xl"
                   data-testid="about-button"
                 >
-                  Lær Mere
+                  ⭐ Lær Mere ⭐
                 </Button>
               </>
             ) : (
@@ -94,19 +94,19 @@ const Home = () => {
                 <Button 
                   onClick={() => navigate("/applications")}
                   size="lg"
-                  className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-10 py-7 rounded-xl font-bold glow-hover"
+                  className="christmas-button text-white text-xl px-10 py-7 rounded-xl font-bold shadow-2xl"
                   data-testid="applications-button"
                 >
-                  Se Ansøgninger
+                  🎁 Se Ansøgninger
                 </Button>
                 <Button 
                   onClick={() => navigate("/my-applications")}
                   size="lg"
                   variant="outline"
-                  className="border-2 border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 text-xl px-10 py-7 rounded-xl font-bold"
+                  className="border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 text-xl px-10 py-7 rounded-xl font-bold shadow-xl"
                   data-testid="my-applications-button"
                 >
-                  Mine Ansøgninger
+                  ✨ Mine Ansøgninger
                 </Button>
               </>
             )}
