@@ -18,6 +18,8 @@ import SearchApplications from "./pages/SearchApplications";
 import FAQ from "./pages/FAQ";
 import { Toaster } from "@/components/ui/sonner";
 import SnowEffect from "./components/SnowEffect";
+import ChristmasMusic from "./components/ChristmasMusic";
+import ChristmasDecorations from "./components/ChristmasDecorations";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
