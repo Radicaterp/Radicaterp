@@ -69,6 +69,8 @@ function App() {
     <AuthContext.Provider value={{ user, setUser, logout, checkAuth }}>
       <div className="App">
         <SnowEffect />
+        <ChristmasDecorations />
+        <ChristmasMusic />
         <Toaster position="top-right" />
         <BrowserRouter>
           <Routes>
