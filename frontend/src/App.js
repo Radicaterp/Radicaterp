@@ -17,6 +17,7 @@ import FiveMPanel from "./pages/FiveMPanel";
 import SearchApplications from "./pages/SearchApplications";
 import FAQ from "./pages/FAQ";
 import { Toaster } from "@/components/ui/sonner";
+import SnowEffect from "./components/SnowEffect";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
