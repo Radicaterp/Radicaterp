@@ -74,16 +74,16 @@ const Home = () => {
                 <Button 
                   onClick={handleLogin}
                   size="lg"
-                  className="bg-gradient-to-r from-[#4A90E2] to-[#5fa3f5] hover:opacity-90 text-white text-xl px-10 py-7 rounded-xl font-bold glow-hover"
+                  className="christmas-button text-white text-xl px-10 py-7 rounded-xl font-bold shadow-2xl"
                   data-testid="hero-login-button"
                 >
-                  Kom i Gang
+                  🎄 Kom i Gang 🎄
                 </Button>
                 <Button 
                   variant="outline"
                   size="lg"
                   onClick={() => navigate("/about")}
-                  className="border-2 border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 text-xl px-10 py-7 rounded-xl font-bold"
+                  className="border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 text-xl px-10 py-7 rounded-xl font-bold shadow-xl"
                   data-testid="about-button"
                 >
                   Lær Mere
