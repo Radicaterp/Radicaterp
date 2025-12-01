@@ -155,3 +155,21 @@ code {
     color: #ffd700;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
+
+/* Christmas lights twinkle animation */
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Christmas button styles */
+.christmas-button {
+    background: linear-gradient(135deg, #c41e3a 0%, #165b33 100%);
+    transition: all 0.3s ease;
+}
+
+.christmas-button:hover {
+    background: linear-gradient(135deg, #165b33 0%, #c41e3a 100%);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(196, 30, 58, 0.5);
+}
