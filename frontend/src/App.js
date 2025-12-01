@@ -66,6 +66,7 @@ function App() {
   return (
     <AuthContext.Provider value={{ user, setUser, logout, checkAuth }}>
       <div className="App">
+        <SnowEffect />
         <Toaster position="top-right" />
         <BrowserRouter>
           <Routes>
