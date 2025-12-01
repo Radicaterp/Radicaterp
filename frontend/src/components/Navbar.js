@@ -45,14 +45,14 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-[#4A90E2]/20" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo - Christmas Edition */}
           <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" data-testid="nav-logo">
             <img 
-              src="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png" 
+              src="/logo.png" 
               alt="Redicate Logo" 
-              className="h-10 w-10 object-contain"
+              className="h-12 w-12 object-contain"
             />
-            <h1 className="text-xl font-bold gradient-text">REDICATE</h1>
+            <h1 className="text-xl font-bold christmas-text">REDICATE 🎄</h1>
           </Link>
 
           {/* Navigation Links */}
