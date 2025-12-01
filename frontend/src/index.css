@@ -113,3 +113,45 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+/* Christmas Theme */
+.christmas-gradient {
+    background: linear-gradient(135deg, #c41e3a 0%, #165b33 50%, #c41e3a 100%);
+}
+
+.christmas-text {
+    background: linear-gradient(90deg, #c41e3a, #ffd700, #165b33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Snowflake Animation */
+.snowflake {
+    position: fixed;
+    top: -10px;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    animation: fall linear forwards;
+    pointer-events: none;
+    user-select: none;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+/* Christmas decorations */
+.glass-card-christmas {
+    background: linear-gradient(135deg, rgba(196, 30, 58, 0.1), rgba(22, 91, 51, 0.1));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Gold accent for Christmas */
+.gold-accent {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
