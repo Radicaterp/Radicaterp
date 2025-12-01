@@ -7,13 +7,17 @@ const ChristmasMusic = () => {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    // Free Christmas music from YouTube Audio Library or similar
-    // Using a placeholder - you should replace with actual Christmas music URL
+    // All I Want for Christmas Is You - Mariah Carey
+    // Replace with your licensed music URL
     const audio = new Audio();
-    // Popular royalty-free Christmas music URLs:
-    // Option 1: Use a direct MP3 link
-    // Option 2: Embed from a service
-    audio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // Placeholder - replace with Christmas music
+    
+    // IMPORTANT: Add your licensed music URL here
+    // Options:
+    // 1. Upload MP3 to /public folder: audio.src = '/christmas-music.mp3';
+    // 2. Use a CDN URL: audio.src = 'https://your-cdn.com/all-i-want-for-christmas.mp3';
+    // 3. Use streaming service embed (different implementation needed)
+    
+    audio.src = '/christmas-music.mp3'; // Update this path with your music file
     audio.loop = true;
     audio.volume = volume;
     audioRef.current = audio;
