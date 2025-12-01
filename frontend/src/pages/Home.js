@@ -44,13 +44,19 @@ const Home = () => {
           </div>
           
           <h1 
-            className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 christmas-text glitch-text tracking-tight" 
+            className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 gradient-text glitch-text tracking-tight" 
             data-text="REDICATE"
           >
             REDICATE 🎄
           </h1>
           
-          <p className="text-xl sm:text-2xl text-yellow-400 mb-4 gold-accent">
+          <p className="text-2xl sm:text-3xl font-bold mb-6" style={{
+            background: 'linear-gradient(90deg, #ffd700, #fff, #ffd700)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textShadow: '0 0 30px rgba(255, 215, 0, 0.5)'
+          }}>
             ❄️ God Jul & Godt Nytår! ❄️
           </p>
           
