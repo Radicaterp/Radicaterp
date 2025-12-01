@@ -21,11 +21,13 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] relative overflow-hidden">
-      {/* Animated Background */}
+      {/* Christmas Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-10"></div>
-        <div className="absolute top-20 left-10 w-96 h-96 bg-[#4A90E2] rounded-full opacity-20 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#5fa3f5] rounded-full opacity-20 blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        {/* Christmas colors - Red and Green */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-red-600 rounded-full opacity-15 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-600 rounded-full opacity-15 blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-yellow-400 rounded-full opacity-10 blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
       <Navbar />
@@ -35,18 +37,22 @@ const Home = () => {
         <div className="text-center max-w-5xl animate-fade-in">
           <div className="mb-8 flex justify-center">
             <img 
-              src="https://customer-assets.emergentagent.com/job_team-management-10/artifacts/pa8pgywq_7442CFA2-6A1F-48F7-81A5-9E9889D2D616-removebg-preview.png" 
+              src="/logo.png" 
               alt="Redicate Logo" 
               className="h-48 w-48 object-contain glow-pulse"
             />
           </div>
           
           <h1 
-            className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 gradient-text glitch-text tracking-tight" 
+            className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-6 christmas-text glitch-text tracking-tight" 
             data-text="REDICATE"
           >
-            REDICATE
+            REDICATE 🎄
           </h1>
+          
+          <p className="text-xl sm:text-2xl text-yellow-400 mb-4 gold-accent">
+            ❄️ God Jul & Godt Nytår! ❄️
+          </p>
           
           <p className="text-2xl sm:text-3xl text-gray-300 mb-4 font-semibold">
             FiveM Roleplay Server
